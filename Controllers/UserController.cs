@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace bingo_api.Controllers;
 
 [ApiController]
-[DisableCors]
 [Route("[controller]")]
 public class UserController : ControllerBase
 {
