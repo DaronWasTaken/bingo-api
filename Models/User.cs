@@ -1,6 +1,8 @@
-﻿namespace bingo_api.Models;
+﻿using Microsoft.AspNetCore.Identity;
 
-public class User
+namespace bingo_api.Models;
+
+public class User : IdentityUser
 {
     public int UserId { get; set; }
 
