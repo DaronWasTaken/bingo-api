@@ -1,4 +1,5 @@
-﻿using bingo_api.Models.Views;
+﻿using bingo_api.Models.Statics;
+using bingo_api.Models.Views;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.Controllers;
@@ -8,17 +9,8 @@ namespace bingo_api.Controllers;
 public class ViewController : ControllerBase
 {
     [HttpGet("levelWidget/{id:int}")]
-    public IActionResult getUserLevelWidget(int id)
+    public IActionResult GetUserLevelWidget(int id)
     {
-        var levelWidgetDto = new LevelWidgetDto
-        {
-            Username = "James",
-            Level = 2,
-            Points = 2300,
-            RequiredPoints = 3000
-        };
-
-        return Ok(levelWidgetDto);
+        return Ok(StaticLevelWidgetDto.LevelWidgetDto);
     }
-        
 }
