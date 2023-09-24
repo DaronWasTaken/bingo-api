@@ -1,6 +1,6 @@
-﻿using bingo_api.Models.DTO;
-using bingo_api.Models.Statics;
-using Microsoft.AspNetCore.Cors;
+﻿using System.ComponentModel.DataAnnotations;
+using bingo_api.Models.Entities;
+using bingo_api.Models.EntityProviders;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.Controllers;
@@ -9,26 +9,27 @@ namespace bingo_api.Controllers;
 [Route("[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
-    public UserController(ILogger<UserController> logger)
-    {
-        _logger = logger;
-    }
-
     [HttpGet("{id:int}")]
-    public IActionResult Get(int id)
+    public IActionResult GetUser(int id)
     {
-        _logger.LogInformation("Getting the user with id: {id}", id);
-
-        var staticLevelWidget = StaticLevelWidgetDto.LevelWidgetDto;
-        
-        return Ok(staticLevelWidget);
+        return Ok(UserProvider.User);
     }
 
-    [HttpPost("{id:int}/awardPoints")]
-    public IActionResult AwardPoints(int id, int points)
+    //TODO: Include all parameters inside request body
+    [HttpPost("{id:int}/quickplay/award")]
+    public IActionResult AwardQuickplayObject(int id, [Required] int quickplayObjectId)
     {
-        StaticLevelWidgetDto.LevelWidgetDto.Points += points;
+        QuickplayObject quickplayObject = QuickplayObjectListProvider.QuickplayObjects.Find(qp => qp.QuickplayObjectId == quickplayObjectId)!;
+        UserProvider.User.Points += quickplayObject.Points;
+        QuickplayObjectListProvider.QuickplayObjects.Remove(quickplayObject);
+        QuickplayObjectListProvider.QuickplayObjects.Add(new QuickplayObject
+        {
+            QuickplayObjectId = 16,
+            Name = "Beer",
+            Points = 200,
+            ScanDate = DateTime.Today,
+            ScanTypeId = 7
+        });
         return NoContent();
     }
 }
