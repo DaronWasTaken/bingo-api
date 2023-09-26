@@ -1,5 +1,4 @@
-﻿using bingo_api.Models.Entities;
-using bingo_api.Models.EntityProviders;
+﻿using bingo_api.Models.EntityProviders;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.Controllers;
