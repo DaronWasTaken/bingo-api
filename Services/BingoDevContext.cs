@@ -2,6 +2,8 @@
 
 namespace bingo_api.EfModels;
 
+
+//TODO: CHECK DB CONTEXT
 public partial class BingoDevContext : DbContext
 {
     public BingoDevContext()
@@ -53,52 +55,52 @@ public partial class BingoDevContext : DbContext
             entity.ToTable("achievement");
 
             entity.Property(e => e.AchievementId).HasColumnName("achievementid");
-            entity.Property(e => e.Badgeid).HasColumnName("badgeid");
+            entity.Property(e => e.BadgeId).HasColumnName("badgeid");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .HasColumnName("name");
             entity.Property(e => e.Points).HasColumnName("points");
-            entity.Property(e => e.Timelyid).HasColumnName("timelyid");
+            entity.Property(e => e.TimelyId).HasColumnName("timelyid");
 
             entity.HasOne(d => d.Badge).WithMany(p => p.Achievements)
-                .HasForeignKey(d => d.Badgeid)
+                .HasForeignKey(d => d.BadgeId)
                 .HasConstraintName("fk_0");
 
             entity.HasOne(d => d.Timely).WithMany(p => p.Achievements)
-                .HasForeignKey(d => d.Timelyid)
+                .HasForeignKey(d => d.TimelyId)
                 .HasConstraintName("achievements_timely");
         });
 
         modelBuilder.Entity<Badge>(entity =>
         {
-            entity.HasKey(e => e.Badgeid).HasName("badges_pk");
+            entity.HasKey(e => e.BadgeId).HasName("badges_pk");
 
             entity.ToTable("badge");
 
-            entity.Property(e => e.Badgeid).HasColumnName("badgeid");
-            entity.Property(e => e.Imageurl)
+            entity.Property(e => e.BadgeId).HasColumnName("badgeid");
+            entity.Property(e => e.ImageUrl)
                 .HasMaxLength(255)
                 .HasColumnName("imageurl");
         });
 
         modelBuilder.Entity<Level>(entity =>
         {
-            entity.HasKey(e => e.Levelnumber).HasName("levels_pk");
+            entity.HasKey(e => e.LevelNumber).HasName("levels_pk");
 
             entity.ToTable("levels");
 
-            entity.Property(e => e.Levelnumber).HasColumnName("levelnumber");
-            entity.Property(e => e.Requiredpoints).HasColumnName("requiredpoints");
+            entity.Property(e => e.LevelNumber).HasColumnName("levelnumber");
+            entity.Property(e => e.RequiredPoints).HasColumnName("requiredpoints");
         });
 
         modelBuilder.Entity<Location>(entity =>
         {
-            entity.HasKey(e => e.Locationid).HasName("locations_pk");
+            entity.HasKey(e => e.LocationId).HasName("locations_pk");
 
             entity.ToTable("location");
 
-            entity.Property(e => e.Locationid).HasColumnName("locationid");
+            entity.Property(e => e.LocationId).HasColumnName("locationid");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Latitude)
                 .HasPrecision(10, 8)
@@ -116,125 +118,125 @@ public partial class BingoDevContext : DbContext
 
         modelBuilder.Entity<Quickplay>(entity =>
         {
-            entity.HasKey(e => e.Quickplayid).HasName("userquickplay_pk");
+            entity.HasKey(e => e.QuickplayId).HasName("userquickplay_pk");
 
             entity.ToTable("quickplay");
 
-            entity.Property(e => e.Quickplayid).HasColumnName("quickplayid");
-            entity.Property(e => e.Lastrefreshdate).HasColumnName("lastrefreshdate");
-            entity.Property(e => e.Quickplayobjectid).HasColumnName("quickplayobjectid");
-            entity.Property(e => e.Userid).HasColumnName("userid");
+            entity.Property(e => e.QuickplayId).HasColumnName("quickplayid");
+            entity.Property(e => e.LastRefreshDate).HasColumnName("lastrefreshdate");
+            entity.Property(e => e.QuickplayObjectId).HasColumnName("quickplayobjectid");
+            entity.Property(e => e.UserId).HasColumnName("userid");
 
-            entity.HasOne(d => d.Quickplayobject).WithMany(p => p.Quickplays)
-                .HasForeignKey(d => d.Quickplayobjectid)
+            entity.HasOne(d => d.QuickplayObject).WithMany(p => p.Quickplays)
+                .HasForeignKey(d => d.QuickplayObjectId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("userquickplay_quickplay");
 
             entity.HasOne(d => d.User).WithMany(p => p.Quickplays)
-                .HasForeignKey(d => d.Userid)
+                .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("userquickplay_users");
         });
 
-        modelBuilder.Entity<Quickplayobject>(entity =>
+        modelBuilder.Entity<QuickplayObject>(entity =>
         {
-            entity.HasKey(e => e.Quickplayid).HasName("quickplayobject_pk");
+            entity.HasKey(e => e.QuickplayId).HasName("quickplayobject_pk");
 
             entity.ToTable("quickplayobject");
 
-            entity.Property(e => e.Quickplayid)
+            entity.Property(e => e.QuickplayId)
                 .ValueGeneratedNever()
                 .HasColumnName("quickplayid");
             entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.Points).HasColumnName("points");
-            entity.Property(e => e.Scandate).HasColumnName("scandate");
-            entity.Property(e => e.Scanobjectid).HasColumnName("scanobjectid");
+            entity.Property(e => e.ScanDate).HasColumnName("scandate");
+            entity.Property(e => e.ScanTypeId).HasColumnName("scantypeid");
 
-            entity.HasOne(d => d.Scanobject).WithMany(p => p.Quickplayobjects)
-                .HasForeignKey(d => d.Scanobjectid)
+            entity.HasOne(d => d.ScanType).WithMany(p => p.QuickplayObjects)
+                .HasForeignKey(d => d.ScanTypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("quickplay_scanobjects");
+                .HasConstraintName("quickplay_scantype");
         });
 
-        modelBuilder.Entity<Scantype>(entity =>
+        modelBuilder.Entity<ScanType>(entity =>
         {
-            entity.HasKey(e => e.Scantypeid).HasName("scanobjects_pk");
+            entity.HasKey(e => e.ScanTypeId).HasName("scanobjects_pk");
 
             entity.ToTable("scantype");
 
-            entity.Property(e => e.Scantypeid).HasColumnName("scantypeid");
+            entity.Property(e => e.ScanTypeId).HasColumnName("scantypeid");
             entity.Property(e => e.Description).HasColumnName("description");
-            entity.Property(e => e.Locationid).HasColumnName("locationid");
+            entity.Property(e => e.LocationId).HasColumnName("locationid");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .HasColumnName("name");
 
-            entity.HasOne(d => d.Location).WithMany(p => p.Scantypes)
-                .HasForeignKey(d => d.Locationid)
+            entity.HasOne(d => d.Location).WithMany(p => p.ScanTypes)
+                .HasForeignKey(d => d.LocationId)
                 .HasConstraintName("scanobjects_locations");
         });
 
         modelBuilder.Entity<Task>(entity =>
         {
-            entity.HasKey(e => e.Taskid).HasName("achievementtasks_pk");
+            entity.HasKey(e => e.TaskId).HasName("achievementtasks_pk");
 
             entity.ToTable("task");
 
-            entity.Property(e => e.Taskid).HasColumnName("taskid");
-            entity.Property(e => e.Achievementid).HasColumnName("achievementid");
+            entity.Property(e => e.TaskId).HasColumnName("taskid");
+            entity.Property(e => e.AchievementId).HasColumnName("achievementid");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
-            entity.Property(e => e.Scanobjectid).HasColumnName("scanobjectid");
+            entity.Property(e => e.ScanTypeId).HasColumnName("scantypeid");
 
             entity.HasOne(d => d.Achievement).WithMany(p => p.Tasks)
-                .HasForeignKey(d => d.Achievementid)
+                .HasForeignKey(d => d.AchievementId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_1");
 
-            entity.HasOne(d => d.Scanobject).WithMany(p => p.Tasks)
-                .HasForeignKey(d => d.Scanobjectid)
+            entity.HasOne(d => d.ScanType).WithMany(p => p.Tasks)
+                .HasForeignKey(d => d.ScanTypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_2");
         });
 
         modelBuilder.Entity<Timely>(entity =>
         {
-            entity.HasKey(e => e.Timelyid).HasName("timely_pk");
+            entity.HasKey(e => e.TimelyId).HasName("timely_pk");
 
             entity.ToTable("timely");
 
-            entity.Property(e => e.Timelyid)
+            entity.Property(e => e.TimelyId)
                 .ValueGeneratedNever()
                 .HasColumnName("timelyid");
             entity.Property(e => e.Description).HasColumnName("description");
-            entity.Property(e => e.Endtime).HasColumnName("endtime");
-            entity.Property(e => e.Starttime).HasColumnName("starttime");
+            entity.Property(e => e.EndTime).HasColumnName("endtime");
+            entity.Property(e => e.StartTime).HasColumnName("starttime");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Userid).HasName("users_pk");
+            entity.HasKey(e => e.UserId).HasName("user_pk");
 
-            entity.ToTable("users");
+            entity.ToTable("user");
 
-            entity.Property(e => e.Userid).HasColumnName("userid");
-            entity.Property(e => e.Levelnumber).HasColumnName("levelnumber");
+            entity.Property(e => e.UserId).HasColumnName("userid");
+            entity.Property(e => e.LevelNumber).HasColumnName("levelnumber");
             entity.Property(e => e.Points).HasColumnName("points");
             entity.Property(e => e.Username)
                 .HasMaxLength(50)
                 .HasColumnName("username");
 
-            entity.HasOne(d => d.LevelnumberNavigation).WithMany(p => p.Users)
-                .HasForeignKey(d => d.Levelnumber)
+            entity.HasOne(d => d.LevelNumberNavigation).WithMany(p => p.Users)
+                .HasForeignKey(d => d.LevelNumber)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("users_levels");
+                .HasConstraintName("user_levels");
         });
 
-        modelBuilder.Entity<Usersachievement>(entity =>
+        modelBuilder.Entity<UserAchievement>(entity =>
         {
             entity.HasKey(e => e.Userachievementid).HasName("userachievements_pk");
 
-            entity.ToTable("usersachievements");
+            entity.ToTable("userachievement");
 
             entity.Property(e => e.Userachievementid).HasColumnName("userachievementid");
             entity.Property(e => e.Achievementid).HasColumnName("achievementid");
@@ -243,36 +245,36 @@ public partial class BingoDevContext : DbContext
                 .HasColumnName("dateearned");
             entity.Property(e => e.Userid).HasColumnName("userid");
 
-            entity.HasOne(d => d.Achievement).WithMany(p => p.Usersachievements)
+            entity.HasOne(d => d.Achievement).WithMany(p => p.UsersAchievements)
                 .HasForeignKey(d => d.Achievementid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("userachievements_achievements");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Usersachievements)
+            entity.HasOne(d => d.User).WithMany(p => p.UsersAchievements)
                 .HasForeignKey(d => d.Userid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_3");
         });
 
-        modelBuilder.Entity<Usertask>(entity =>
+        modelBuilder.Entity<UserTask>(entity =>
         {
-            entity.HasKey(e => e.Usertaskid).HasName("usertask_pk");
+            entity.HasKey(e => e.UserTaskId).HasName("usertask_pk");
 
             entity.ToTable("usertask");
 
-            entity.Property(e => e.Usertaskid).HasColumnName("usertaskid");
-            entity.Property(e => e.Datecompleted).HasColumnName("datecompleted");
-            entity.Property(e => e.Quantitycompleted).HasColumnName("quantitycompleted");
-            entity.Property(e => e.Taskid).HasColumnName("taskid");
-            entity.Property(e => e.Userid).HasColumnName("userid");
+            entity.Property(e => e.UserTaskId).HasColumnName("usertaskid");
+            entity.Property(e => e.DateCompleted).HasColumnName("datecompleted");
+            entity.Property(e => e.QuantityCompleted).HasColumnName("quantitycompleted");
+            entity.Property(e => e.TaskId).HasColumnName("taskid");
+            entity.Property(e => e.UserId).HasColumnName("userid");
 
-            entity.HasOne(d => d.Task).WithMany(p => p.Usertasks)
-                .HasForeignKey(d => d.Taskid)
+            entity.HasOne(d => d.Task).WithMany(p => p.UserTasks)
+                .HasForeignKey(d => d.TaskId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("user_achievement_tasks_achievementtasks");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Usertasks)
-                .HasForeignKey(d => d.Userid)
+            entity.HasOne(d => d.User).WithMany(p => p.UserTasks)
+                .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("user_achievement_tasks_users");
         });
