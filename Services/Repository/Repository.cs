@@ -1,5 +1,4 @@
-﻿using bingo_api.EfModels;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Task = System.Threading.Tasks.Task;
 
 namespace bingo_api.Services;

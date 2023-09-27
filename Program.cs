@@ -1,6 +1,8 @@
-using bingo_api.EfModels;
+using bingo_api;
+using bingo_api.Models.Entities;
 using bingo_api.Services;
 using bingo_api.Services.Level;
+using bingo_api.Services.User;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +15,7 @@ builder.Services.AddDbContext<BingoDevContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<ILevelService, LevelService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Logging.AddConsole();
 
 var app = builder.Build();
@@ -40,23 +43,5 @@ app.UseCors(options => options
     .AllowAnyHeader()
     .AllowAnyMethod()
 );
-
-app.MapPost("/createLevel", (BingoDevContext db) =>
-{
-    var newLevel = new Level
-    {
-        LevelNumber = 2,
-        RequiredPoints = 1000
-    };
-
-    db.Levels.Add(newLevel);
-    db.SaveChanges();
-});
-
-app.MapDelete("/removeLevel/{id:int}",(BingoDevContext db, int id) =>
-{
-    db.Levels.Remove(db.Levels.Find(id));
-    db.SaveChanges();
-});
 
 app.Run();

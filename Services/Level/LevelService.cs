@@ -1,6 +1,4 @@
-﻿using bingo_api.EfModels;
-
-namespace bingo_api.Services.Level;
+﻿namespace bingo_api.Services.Level;
 
 public class LevelService : ILevelService
 {

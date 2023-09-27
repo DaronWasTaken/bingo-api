@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace bingo_api.EfModels;
+﻿namespace bingo_api.Models.Entities;
 
 public class Achievement
 {
@@ -23,5 +20,5 @@ public class Achievement
 
     public virtual Timely? Timely { get; set; }
 
-    public virtual ICollection<UserAchievement> UsersAchievements { get; set; } = new List<UserAchievement>();
+    public virtual ICollection<UserAchievement> UserAchievements { get; set; } = new List<UserAchievement>();
 }

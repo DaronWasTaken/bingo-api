@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using bingo_api.Models.Entities;
-using bingo_api.Models.EntityProviders;
+using bingo_api.Models.Views;
+using bingo_api.Services.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.Controllers;
@@ -9,27 +9,25 @@ namespace bingo_api.Controllers;
 [Route("[controller]")]
 public class UserController : ControllerBase
 {
-    [HttpGet("{id:int}")]
-    public IActionResult GetUser(int id)
+
+    private readonly IUserService _userService;
+
+    public UserController(IUserService userService)
     {
-        return Ok(UserProvider.User);
+        _userService = userService;
+    }
+
+    [HttpGet("/levelWidget/{id:int}")]
+    public async Task<IActionResult> GetUserLevelWidget(int id)
+    {
+        LevelWidgetDto levelWidgetDto = await _userService.GetUserLevelWidget(id);
+        return Ok(levelWidgetDto);
     }
 
     //TODO: Include all parameters inside request body
     [HttpPost("{id:int}/quickplay/award")]
     public IActionResult AwardQuickplayObject(int id, [Required] int quickplayObjectId)
     {
-        QuickplayObject quickplayObject = QuickplayObjectListProvider.QuickplayObjects.Find(qp => qp.QuickplayObjectId == quickplayObjectId)!;
-        UserProvider.User.Points += quickplayObject.Points;
-        QuickplayObjectListProvider.QuickplayObjects.Remove(quickplayObject);
-        QuickplayObjectListProvider.QuickplayObjects.Add(new QuickplayObject
-        {
-            QuickplayObjectId = 16,
-            Name = "Beer",
-            Points = 200,
-            ScanDate = DateTime.Today,
-            ScanTypeId = 7
-        });
-        return NoContent();
+        return Ok();
     }
 }
