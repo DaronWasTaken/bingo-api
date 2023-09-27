@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace bingo_api.EfModels;
 
-public partial class Task
+public class Task
 {
-    public int Taskid { get; set; }
+    public int TaskId { get; set; }
 
-    public int Achievementid { get; set; }
+    public int AchievementId { get; set; }
 
-    public int Scanobjectid { get; set; }
+    public int ScanTypeId { get; set; }
 
     public string? Description { get; set; }
 
@@ -17,7 +17,7 @@ public partial class Task
 
     public virtual Achievement Achievement { get; set; } = null!;
 
-    public virtual Scantype Scanobject { get; set; } = null!;
+    public virtual ScanType ScanType { get; set; } = null!;
 
-    public virtual ICollection<Usertask> Usertasks { get; set; } = new List<Usertask>();
+    public virtual ICollection<UserTask> UserTasks { get; set; } = new List<UserTask>();
 }

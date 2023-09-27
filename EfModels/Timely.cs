@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace bingo_api.EfModels;
 
-public partial class Timely
+public class Timely
 {
-    public int Timelyid { get; set; }
+    public int TimelyId { get; set; }
 
-    public DateOnly Starttime { get; set; }
+    public DateOnly StartTime { get; set; }
 
-    public DateOnly Endtime { get; set; }
+    public DateOnly EndTime { get; set; }
 
     public string Description { get; set; } = null!;
 

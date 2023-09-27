@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace bingo_api.EfModels;
 
-public partial class Badge
+public class Badge
 {
-    public int Badgeid { get; set; }
+    public int BadgeId { get; set; }
 
-    public string? Imageurl { get; set; }
+    public string? ImageUrl { get; set; }
 
     public virtual ICollection<Achievement> Achievements { get; set; } = new List<Achievement>();
 }

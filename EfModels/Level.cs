@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace bingo_api.EfModels;
 
-public partial class Level
+public class Level
 {
-    public int Levelnumber { get; set; }
+    public int LevelNumber { get; set; }
 
-    public int Requiredpoints { get; set; }
+    public int RequiredPoints { get; set; }
 
     public virtual ICollection<User> Users { get; set; } = new List<User>();
 }

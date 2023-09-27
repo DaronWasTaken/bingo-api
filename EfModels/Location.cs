@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace bingo_api.EfModels;
 
-public partial class Location
+public class Location
 {
-    public int Locationid { get; set; }
+    public int LocationId { get; set; }
 
     public string Name { get; set; } = null!;
 
@@ -17,5 +17,5 @@ public partial class Location
 
     public decimal Radius { get; set; }
 
-    public virtual ICollection<Scantype> Scantypes { get; set; } = new List<Scantype>();
+    public virtual ICollection<ScanType> ScanTypes { get; set; } = new List<ScanType>();
 }

@@ -24,9 +24,9 @@ public partial class BingoDevContext : DbContext
 
     public virtual DbSet<Quickplay> Quickplays { get; set; }
 
-    public virtual DbSet<Quickplayobject> Quickplayobjects { get; set; }
+    public virtual DbSet<QuickplayObject> Quickplayobjects { get; set; }
 
-    public virtual DbSet<Scantype> Scantypes { get; set; }
+    public virtual DbSet<ScanType> Scantypes { get; set; }
 
     public virtual DbSet<Task> Tasks { get; set; }
 
@@ -34,9 +34,9 @@ public partial class BingoDevContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    public virtual DbSet<Usersachievement> Usersachievements { get; set; }
+    public virtual DbSet<UserAchievement> Usersachievements { get; set; }
 
-    public virtual DbSet<Usertask> Usertasks { get; set; }
+    public virtual DbSet<UserTask> Usertasks { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -48,11 +48,11 @@ public partial class BingoDevContext : DbContext
     {
         modelBuilder.Entity<Achievement>(entity =>
         {
-            entity.HasKey(e => e.Achievementid).HasName("achievements_pk");
+            entity.HasKey(e => e.AchievementId).HasName("achievements_pk");
 
             entity.ToTable("achievement");
 
-            entity.Property(e => e.Achievementid).HasColumnName("achievementid");
+            entity.Property(e => e.AchievementId).HasColumnName("achievementid");
             entity.Property(e => e.Badgeid).HasColumnName("badgeid");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Name)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace bingo_api.EfModels;
 
-public partial class Usersachievement
+public class UserAchievement
 {
     public int Userachievementid { get; set; }
 
