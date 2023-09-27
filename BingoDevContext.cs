@@ -136,11 +136,11 @@ public partial class BingoDevContext : DbContext
 
         modelBuilder.Entity<QuickplayObject>(entity =>
         {
-            entity.HasKey(e => e.QuickplayId).HasName("quickplayobject_pk");
+            entity.HasKey(e => e.QuickplayObjectId).HasName("quickplayobject_pk");
 
             entity.ToTable("quickplayobject");
 
-            entity.Property(e => e.QuickplayId).HasColumnName("quickplayid");
+            entity.Property(e => e.QuickplayObjectId).HasColumnName("quickplayid");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .HasColumnName("name");

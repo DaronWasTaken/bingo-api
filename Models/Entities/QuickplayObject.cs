@@ -2,7 +2,7 @@
 
 public class QuickplayObject
 {
-    public int QuickplayId { get; set; }
+    public int QuickplayObjectId { get; set; }
 
     public int ScanTypeId { get; set; }
 

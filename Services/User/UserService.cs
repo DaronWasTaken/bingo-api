@@ -8,12 +8,10 @@ using Models.Entities;
 public class UserService : IUserService
 {
     private readonly BingoDevContext _context;
-    private readonly IRepository<User> _userRepository;
 
-    public UserService(BingoDevContext context, IRepository<User> userRepository)
+    public UserService(BingoDevContext context)
     {
         _context = context;
-        _userRepository = userRepository;
     }
 
     public async Task<LevelWidgetDto> GetUserLevelWidget(int id)
@@ -29,7 +27,24 @@ public class UserService : IUserService
             RequiredPoints = user.LevelNumberNavigation.LevelNumber,
             Username = user.Username
         };
-
+        
         return levelWidgetDto;
+    }
+
+    public async void AwardUserQuickplay(int userId, int quickplayObjectId)
+    {
+        var user = await _context.Users
+            .Include(user => user.Quickplays)
+            .FirstAsync(user => user.UserId == userId);
+        
+        var quickplay = await _context.Quickplays
+            .FirstAsync(qp => qp.UserId == user.UserId && qp.QuickplayObjectId == quickplayObjectId);
+
+        var quickplayObject = await
+            _context.QuickplayObjects.FirstAsync(x => x.QuickplayObjectId == quickplay.QuickplayObjectId);
+        
+        user.Points += quickplayObject.Points;
+        user.Quickplays.Remove(quickplay);
+        await _context.SaveChangesAsync();
     }
 }

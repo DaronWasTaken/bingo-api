@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using bingo_api.Models.Entities;
 using bingo_api.Models.Views;
+using bingo_api.Services;
 using bingo_api.Services.User;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +13,12 @@ public class UserController : ControllerBase
 {
 
     private readonly IUserService _userService;
+    private readonly IRepository<User> _userRepository;
 
-    public UserController(IUserService userService)
+    public UserController(IUserService userService, IRepository<User> userRepository)
     {
         _userService = userService;
+        _userRepository = userRepository;
     }
 
     [HttpGet("/levelWidget/{id:int}")]
@@ -23,11 +27,18 @@ public class UserController : ControllerBase
         LevelWidgetDto levelWidgetDto = await _userService.GetUserLevelWidget(id);
         return Ok(levelWidgetDto);
     }
-
-    //TODO: Include all parameters inside request body
-    [HttpPost("{id:int}/quickplay/award")]
-    public IActionResult AwardQuickplayObject(int id, [Required] int quickplayObjectId)
+    
+    [HttpPost("{userId:int}/quickplay/award/{quickplayObjectId:int}")]
+    public IActionResult AwardQuickplayObject(int userId, int quickplayObjectId)
     {
-        return Ok();
+        _userService.AwardUserQuickplay(userId, quickplayObjectId);
+        return NoContent();
     }
+    
+    [HttpGet("/{id:int}")]
+    public async Task<IActionResult> GetUser(int id)
+    {
+        return Ok(await _userRepository.GetByIdAsync(id));
+    }
+    
 }
