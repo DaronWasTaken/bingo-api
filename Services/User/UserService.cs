@@ -1,4 +1,5 @@
 ﻿using bingo_api.Models.DTOs;
+using bingo_api.Models.Entities;
 using bingo_api.Models.Views.Responses;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,7 +31,7 @@ public class UserService : IUserService
         return levelWidgetDto;
     }
 
-    public async Task<IEnumerable<Models.Entities.User>> GetUsers()
+    public async Task<IEnumerable<User>> GetUsersWithQuickplays()
     {
         var result = await _context.Users
             .Include(q => q.Quickplays)
@@ -50,7 +51,7 @@ public class UserService : IUserService
         {
             Level = user.LevelNumber,
             Points = user.Points,
-            RequiredPoints = user.LevelNumberNavigation.LevelNumber,
+            RequiredPoints = user.LevelNumberNavigation.RequiredPoints,
             Username = user.Username
         };
 
@@ -65,7 +66,7 @@ public class UserService : IUserService
                 Points = q.QuickplayObject.Points
             }).ToListAsync();
 
-        QuickplayScreenDto quickplayScreenDto = new QuickplayScreenDto
+        var quickplayScreenDto = new QuickplayScreenDto
         {
             LevelWidgetDto = levelWidgetDto,
             Quickplays = quickplayDtos,
