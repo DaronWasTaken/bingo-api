@@ -10,7 +10,7 @@ public class QuickplayObject
 
     public string Name { get; set; }
 
-    public DateOnly ScanDate { get; set; }
+    public DateTime ScanDate { get; set; }
 
     public int Points { get; set; }
 
