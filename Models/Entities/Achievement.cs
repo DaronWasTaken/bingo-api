@@ -16,7 +16,7 @@ public class Achievement
 
     public virtual Badge? Badge { get; set; }
 
-    public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
+    public virtual ICollection<TaskModel> Tasks { get; set; } = new List<TaskModel>();
 
     public virtual Timely? Timely { get; set; }
 

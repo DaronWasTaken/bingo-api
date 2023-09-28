@@ -1,6 +1,6 @@
 ﻿namespace bingo_api.Models.Entities;
 
-public class Task
+public class TaskModel
 {
     public int TaskId { get; set; }
 

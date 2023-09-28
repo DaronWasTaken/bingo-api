@@ -1,4 +1,6 @@
-﻿namespace bingo_api.Models.Entities;
+﻿using System.Text.Json.Serialization;
+
+namespace bingo_api.Models.Entities;
 
 public class QuickplayObject
 {
@@ -12,6 +14,7 @@ public class QuickplayObject
 
     public int Points { get; set; }
 
+    [JsonIgnore]
     public virtual ICollection<Quickplay> Quickplays { get; set; } = new List<Quickplay>();
 
     public virtual ScanType ScanType { get; set; } = null!;

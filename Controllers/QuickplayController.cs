@@ -1,5 +1,6 @@
 ﻿using bingo_api.Models.Entities;
 using bingo_api.Services;
+using bingo_api.Services.Quickplay;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.Controllers;
@@ -9,15 +10,23 @@ namespace bingo_api.Controllers;
 public class QuickplayController : ControllerBase
 {
     private readonly IRepository<Quickplay> _quickplayRepository;
-
-    public QuickplayController(IRepository<Quickplay> quickplayRepository)
+    private readonly IQuickplayService _quickplayService;
+    public QuickplayController(IRepository<Quickplay> quickplayRepository, IQuickplayService quickplayService)
     {
         _quickplayRepository = quickplayRepository;
+        _quickplayService = quickplayService;
     }
 
     [HttpGet]
-    public IActionResult GetQuickplay()
+    public async Task<IActionResult> GetQuickplay()
     {
-        return Ok(_quickplayRepository.GetAllAsync());
+        return Ok(await _quickplayRepository.GetAllAsync());
+    }
+
+    [HttpPost("{quickplayId:int}")]
+    public async Task<IActionResult> AwardQuickplayByQuickplayId(int quickplayId)
+    {
+        await _quickplayService.AwardQuickplay(quickplayId);
+        return NoContent();
     }
 }

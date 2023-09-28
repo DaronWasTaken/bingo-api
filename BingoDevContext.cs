@@ -1,6 +1,5 @@
 ﻿using bingo_api.Models.Entities;
 using Microsoft.EntityFrameworkCore;
-using Task = bingo_api.Models.Entities.Task;
 
 namespace bingo_api;
 
@@ -29,10 +28,9 @@ public partial class BingoDevContext : DbContext
 
     public virtual DbSet<ScanType> ScanTypes { get; set; }
 
-    public virtual DbSet<Task> Tasks { get; set; }
+    public virtual DbSet<TaskModel> Tasks { get; set; }
 
     public virtual DbSet<Timely> Timelies { get; set; }
-
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserAchievement> UserAchievements { get; set; }
@@ -172,7 +170,7 @@ public partial class BingoDevContext : DbContext
                 .HasConstraintName("scanobjects_locations");
         });
 
-        modelBuilder.Entity<Task>(entity =>
+        modelBuilder.Entity<TaskModel>(entity =>
         {
             entity.HasKey(e => e.TaskId).HasName("achievementtasks_pk");
 
@@ -207,7 +205,7 @@ public partial class BingoDevContext : DbContext
             entity.Property(e => e.StartTime).HasColumnName("starttime");
         });
 
-        modelBuilder.Entity<Models.Entities.User>(entity =>
+        modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.UserId).HasName("users_pk");
 
@@ -262,7 +260,7 @@ public partial class BingoDevContext : DbContext
             entity.Property(e => e.TaskId).HasColumnName("taskid");
             entity.Property(e => e.UserId).HasColumnName("userid");
 
-            entity.HasOne(d => d.Task).WithMany(p => p.UserTasks)
+            entity.HasOne(d => d.TaskModel).WithMany(p => p.UserTasks)
                 .HasForeignKey(d => d.TaskId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("user_achievement_tasks_achievementtasks");

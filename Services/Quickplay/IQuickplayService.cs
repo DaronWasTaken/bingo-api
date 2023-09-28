@@ -2,5 +2,5 @@
 
 public interface IQuickplayService
 {
-    
+    public Task AwardQuickplay(int id);
 }

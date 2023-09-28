@@ -1,9 +1,7 @@
 ﻿using bingo_api.Models.Views;
 using Microsoft.EntityFrameworkCore;
 
-namespace bingo_api.Services.User;
-
-using Models.Entities;
+namespace bingo_api.Services;
 
 public class UserService : IUserService
 {
@@ -31,20 +29,12 @@ public class UserService : IUserService
         return levelWidgetDto;
     }
 
-    public async void AwardUserQuickplay(int userId, int quickplayObjectId)
+    public async Task<IEnumerable<Models.Entities.User>> GetUsers()
     {
-        var user = await _context.Users
-            .Include(user => user.Quickplays)
-            .FirstAsync(user => user.UserId == userId);
-        
-        var quickplay = await _context.Quickplays
-            .FirstAsync(qp => qp.UserId == user.UserId && qp.QuickplayObjectId == quickplayObjectId);
-
-        var quickplayObject = await
-            _context.QuickplayObjects.FirstAsync(x => x.QuickplayObjectId == quickplay.QuickplayObjectId);
-        
-        user.Points += quickplayObject.Points;
-        user.Quickplays.Remove(quickplay);
-        await _context.SaveChangesAsync();
+        var result = await _context.Users
+            .Include(q => q.Quickplays)
+            .ThenInclude(q => q.QuickplayObject)
+            .ToListAsync();
+        return result;
     }
 }

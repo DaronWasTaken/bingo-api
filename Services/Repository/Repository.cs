@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Task = System.Threading.Tasks.Task;
 
 namespace bingo_api.Services;
 

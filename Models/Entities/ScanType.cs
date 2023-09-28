@@ -14,5 +14,5 @@ public class ScanType
 
     public virtual ICollection<QuickplayObject> QuickplayObjects { get; set; } = new List<QuickplayObject>();
 
-    public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
+    public virtual ICollection<TaskModel> Tasks { get; set; } = new List<TaskModel>();
 }

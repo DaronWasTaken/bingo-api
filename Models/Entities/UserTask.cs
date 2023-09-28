@@ -12,7 +12,7 @@ public class UserTask
 
     public int QuantityCompleted { get; set; }
 
-    public virtual Task Task { get; set; } = null!;
+    public virtual TaskModel TaskModel { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;
 }

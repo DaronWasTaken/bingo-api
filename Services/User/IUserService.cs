@@ -1,10 +1,9 @@
 ﻿using bingo_api.Models.Views;
-using Task = bingo_api.Models.Entities.Task;
 
-namespace bingo_api.Services.User;
+namespace bingo_api.Services;
 
 public interface IUserService
 {
+    public Task<IEnumerable<Models.Entities.User>> GetUsers();
     public Task<LevelWidgetDto> GetUserLevelWidget(int id);
-    public void AwardUserQuickplay(int userId, int quickplayObjectId);
 }
