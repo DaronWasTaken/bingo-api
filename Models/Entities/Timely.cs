@@ -4,9 +4,9 @@ public class Timely
 {
     public int TimelyId { get; set; }
 
-    public DateOnly StartTime { get; set; }
+    public DateTime StartTime { get; set; }
 
-    public DateOnly EndTime { get; set; }
+    public DateTime EndTime { get; set; }
 
     public string Description { get; set; } = null!;
 

@@ -1,5 +1,4 @@
 ﻿using bingo_api.Models.DTOs;
-using bingo_api.Models.Views;
 using bingo_api.Models.Views.Responses;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,7 +23,7 @@ public class UserService : IUserService
         {
             Level = user.LevelNumber,
             Points = user.Points,
-            RequiredPoints = user.LevelNumberNavigation.LevelNumber,
+            RequiredPoints = user.LevelNumberNavigation.RequiredPoints,
             Username = user.Username
         };
         
