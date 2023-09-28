@@ -1,5 +1,6 @@
 ﻿using bingo_api.Models.Entities;
 using bingo_api.Models.Views;
+using bingo_api.Models.Views.Responses;
 using bingo_api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,6 +37,12 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetUsers()
     {
         return Ok(await _userService.GetUsers());
+    }
+
+    [HttpGet("quickplay/{userId:int}")]
+    public async Task<IActionResult> GetUserQuickplayScreen(int userId)
+    {
+        return Ok(await _userService.GetUserQuickplayScreen(userId));
     }
     
 }

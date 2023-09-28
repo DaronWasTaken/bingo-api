@@ -23,7 +23,7 @@ public class QuickplayController : ControllerBase
         return Ok(await _quickplayRepository.GetAllAsync());
     }
 
-    [HttpPost("{quickplayId:int}")]
+    [HttpPost("award/{quickplayId:int}")]
     public async Task<IActionResult> AwardQuickplayByQuickplayId(int quickplayId)
     {
         await _quickplayService.AwardQuickplay(quickplayId);
