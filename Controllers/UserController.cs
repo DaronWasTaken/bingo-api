@@ -1,6 +1,7 @@
-﻿using bingo_api.Models.DTO;
-using bingo_api.Models.Statics;
-using Microsoft.AspNetCore.Cors;
+﻿using bingo_api.Models.Entities;
+using bingo_api.Models.Views;
+using bingo_api.Models.Views.Responses;
+using bingo_api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.Controllers;
@@ -9,26 +10,39 @@ namespace bingo_api.Controllers;
 [Route("[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
-    public UserController(ILogger<UserController> logger)
+
+    private readonly IUserService _userService;
+    private readonly IRepository<User> _userRepository;
+
+    public UserController(IUserService userService, IRepository<User> userRepository)
     {
-        _logger = logger;
+        _userService = userService;
+        _userRepository = userRepository;
     }
 
+    [HttpGet("levelWidget/{id:int}")]
+    public async Task<IActionResult> GetUserLevelWidget(int id)
+    {
+        LevelWidgetDto levelWidgetDto = await _userService.GetUserLevelWidget(id);
+        return Ok(levelWidgetDto);
+    }
+    
     [HttpGet("{id:int}")]
-    public IActionResult Get(int id)
+    public async Task<IActionResult> GetUser(int id)
     {
-        _logger.LogInformation("Getting the user with id: {id}", id);
-
-        var staticLevelWidget = StaticLevelWidgetDto.LevelWidgetDto;
-        
-        return Ok(staticLevelWidget);
+        return Ok(await _userRepository.GetByIdAsync(id));
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetUsers()
+    {
+        return Ok(await _userService.GetUsersWithQuickplays());
     }
 
-    [HttpPost("{id:int}/awardPoints")]
-    public IActionResult AwardPoints(int id, int points)
+    [HttpGet("quickplay/{userId:int}")]
+    public async Task<IActionResult> GetUserQuickplayScreen(int userId)
     {
-        StaticLevelWidgetDto.LevelWidgetDto.Points += points;
-        return NoContent();
+        return Ok(await _userService.GetUserQuickplayScreen(userId));
     }
+    
 }

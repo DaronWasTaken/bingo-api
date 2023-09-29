@@ -1,12 +1,10 @@
-﻿namespace bingo_api.Models;
+﻿namespace bingo_api.Models.Entities;
 
 public class Level
 {
-    public int LevelId { get; set; }
-
     public int LevelNumber { get; set; }
 
-    public int? XpRequired { get; set; }
+    public int RequiredPoints { get; set; }
 
     public virtual ICollection<User> Users { get; set; } = new List<User>();
 }

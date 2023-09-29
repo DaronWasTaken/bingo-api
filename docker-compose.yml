@@ -11,8 +11,8 @@ services:
     depends_on:
       - db
     environment:
-      - ConnectionString=<insert_connection>;
-
+      - ConnectionStrings:DefaultConnection=<connection_string>;
+  
   db:
     image: postgres:latest
     ports:

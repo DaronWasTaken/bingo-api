@@ -1,4 +1,4 @@
-﻿namespace bingo_api.Models;
+﻿namespace bingo_api.Models.Entities;
 
 public class Location
 {
@@ -14,5 +14,5 @@ public class Location
 
     public decimal Radius { get; set; }
 
-    public virtual ICollection<ScanObject> ScanObjects { get; set; } = new List<ScanObject>();
+    public virtual ICollection<ScanType> ScanTypes { get; set; } = new List<ScanType>();
 }

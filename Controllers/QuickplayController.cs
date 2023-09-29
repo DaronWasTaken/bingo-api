@@ -1,5 +1,6 @@
-﻿using bingo_api.Models.DTO;
-using Microsoft.AspNetCore.Cors;
+﻿using bingo_api.Models.Entities;
+using bingo_api.Services;
+using bingo_api.Services.Quickplay;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.Controllers;
@@ -8,48 +9,24 @@ namespace bingo_api.Controllers;
 [Route("[controller]")]
 public class QuickplayController : ControllerBase
 {
-    [HttpGet("{id:int}")]
-    public IActionResult GetUserQuickplay(int id)
+    private readonly IRepository<Quickplay> _quickplayRepository;
+    private readonly IQuickplayService _quickplayService;
+    public QuickplayController(IRepository<Quickplay> quickplayRepository, IQuickplayService quickplayService)
     {
-        var userQuickPlayDto = new UserQuickplayDto
-        {
-            UserId = 1,
-            Username = "James",
-            UserLevel = 2,
-            UserNextLvlRequiredPoints = 3000,
-            QuickPlayDtos = new List<QuickPlayDto>()
-        };
+        _quickplayRepository = quickplayRepository;
+        _quickplayService = quickplayService;
+    }
 
-        var quickPlayDto = new QuickPlayDto
-        {
-            Id = 1,
-            Name = "Balloon",
-            points = 200,
-            ScannableObjectId = 2
-        };
-        
-        userQuickPlayDto.QuickPlayDtos.Add(quickPlayDto);
-        
-        var quickPlayDto2 = new QuickPlayDto
-        {
-            Id = 2,
-            Name = "Car",
-            points = 100,
-            ScannableObjectId = 1
-        };
-        
-        userQuickPlayDto.QuickPlayDtos.Add(quickPlayDto2);
-        
-        var quickPlayDto3 = new QuickPlayDto
-        {
-            Id = 3,
-            Name = "Bird",
-            points = 200,
-            ScannableObjectId = 3
-        };
-        
-        userQuickPlayDto.QuickPlayDtos.Add(quickPlayDto3);
+    [HttpGet]
+    public async Task<IActionResult> GetQuickplay()
+    {
+        return Ok(await _quickplayRepository.GetAllAsync());
+    }
 
-        return Ok(userQuickPlayDto);
+    [HttpPost("award/{quickplayId:int}")]
+    public async Task<IActionResult> AwardQuickplayByQuickplayId(int quickplayId)
+    {
+        await _quickplayService.AwardQuickplay(quickplayId);
+        return NoContent();
     }
 }

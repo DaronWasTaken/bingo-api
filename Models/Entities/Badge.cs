@@ -1,10 +1,8 @@
-﻿namespace bingo_api.Models;
+﻿namespace bingo_api.Models.Entities;
 
 public class Badge
 {
     public int BadgeId { get; set; }
-
-    public string? Name { get; set; }
 
     public string? ImageUrl { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using bingo_api.Models.Views;
+using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.Controllers;
 

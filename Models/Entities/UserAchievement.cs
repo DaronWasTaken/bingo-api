@@ -1,4 +1,4 @@
-﻿namespace bingo_api.Models;
+﻿namespace bingo_api.Models.Entities;
 
 public class UserAchievement
 {
@@ -10,9 +10,7 @@ public class UserAchievement
 
     public DateTime? DateEarned { get; set; }
 
-    public bool Completed { get; set; }
+    public virtual Achievement Achievement { get; set; } = null!;
 
-    public Achievement Achievement { get; set; } = null!;
-
-    public User User { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 }

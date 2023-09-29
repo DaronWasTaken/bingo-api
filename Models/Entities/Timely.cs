@@ -1,4 +1,4 @@
-﻿namespace bingo_api.Models;
+﻿namespace bingo_api.Models.Entities;
 
 public class Timely
 {
@@ -10,7 +10,5 @@ public class Timely
 
     public string Description { get; set; } = null!;
 
-    public int AchievementId { get; set; }
-
-    public virtual Achievement Achievement { get; set; } = null!;
+    public virtual ICollection<Achievement> Achievements { get; set; } = new List<Achievement>();
 }
