@@ -15,7 +15,7 @@ public class LevelService : ILevelService
     {
         user.Points += points;
         var pointsSurplus = user.Points - user.LevelNumberNavigation.RequiredPoints;
-        if (pointsSurplus > 0)
+        if (pointsSurplus >= 0)
         {
             if (await _context.Levels.FindAsync(user.LevelNumber + 1) != null)
             {
