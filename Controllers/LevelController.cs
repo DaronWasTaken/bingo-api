@@ -1,6 +1,5 @@
 ﻿using bingo_api.Models.Entities;
 using bingo_api.Services;
-using bingo_api.Services.Level;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.Controllers;

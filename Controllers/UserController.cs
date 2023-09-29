@@ -36,7 +36,7 @@ public class UserController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetUsers()
     {
-        return Ok(await _userService.GetUsers());
+        return Ok(await _userService.GetUsersWithQuickplays());
     }
 
     [HttpGet("quickplay/{userId:int}")]
