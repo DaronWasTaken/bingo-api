@@ -1,4 +1,4 @@
-﻿namespace bingo_api.Models.Views.Responses;
+﻿namespace bingo_api.Models.Views;
 
 public class LevelWidgetDto
 {

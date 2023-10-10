@@ -1,12 +1,10 @@
-﻿namespace bingo_api.Models.Entities;
+﻿using Microsoft.AspNetCore.Identity;
 
-public class User
+namespace bingo_api.Models;
+
+public class User : IdentityUser
 {
-    public int UserId { get; set; }
-
     public int LevelNumber { get; set; }
-
-    public string Username { get; set; } = null!;
 
     public int Points { get; set; }
 

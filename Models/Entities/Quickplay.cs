@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace bingo_api.Models.Entities;
+﻿namespace bingo_api.Models;
 
 public class Quickplay
 {
@@ -8,12 +6,13 @@ public class Quickplay
 
     public int QuickplayObjectId { get; set; }
 
-    public int UserId { get; set; }
+    public string UserId { get; set; } = null!;
 
-    public DateOnly? LastRefreshDate { get; set; }
+    public DateTime? LastRefreshDate { get; set; }
+
+    public DateTime? ScanDate { get; set; }
 
     public virtual QuickplayObject QuickplayObject { get; set; } = null!;
-    
-    [JsonIgnore]
+
     public virtual User User { get; set; } = null!;
 }

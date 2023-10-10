@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using bingo_api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.Services;
 
@@ -14,7 +15,7 @@ public class Repository<T> : IRepository<T> where T : class
     }
 
     public async Task<IEnumerable<T>> GetAllAsync() => await _entities.ToListAsync();
-    public ValueTask<T?> GetByIdAsync(int id) => _entities.FindAsync(id);
+    public ValueTask<T?> GetByIdAsync(string id) => _entities.FindAsync(id);
     
     public async Task AddAsync(T entity)
     {

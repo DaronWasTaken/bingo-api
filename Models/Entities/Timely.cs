@@ -1,6 +1,9 @@
-﻿namespace bingo_api.Models.Entities;
+﻿using System;
+using System.Collections.Generic;
 
-public class Timely
+namespace bingo_api.Models;
+
+public partial class Timely
 {
     public int TimelyId { get; set; }
 

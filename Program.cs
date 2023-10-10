@@ -1,6 +1,6 @@
-using bingo_api;
+using bingo_api.Models;
 using bingo_api.Services;
-using bingo_api.Services.Quickplay;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +11,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<BingoDevContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<BingoDevContext>()
+    .AddDefaultTokenProviders();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<ILevelService, LevelService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -34,8 +37,13 @@ if (app.Environment.IsProduction())
     app.UseHsts();
 }
 
+using var serviceScope = app.Services.CreateScope();
+var dbContext = serviceScope.ServiceProvider.GetRequiredService<BingoDevContext>();
+dbContext.Database.Migrate();
+
 app.UseHttpsRedirection();
 app.UseAuthorization();
+app.UseAuthentication();
 app.MapControllers();
 app.UseCors(options => options
     .AllowAnyOrigin()

@@ -1,12 +1,12 @@
-﻿namespace bingo_api.Models.Entities;
+﻿namespace bingo_api.Models;
 
-public class TaskModel
+public class TaskEntity
 {
     public int TaskId { get; set; }
 
     public int AchievementId { get; set; }
 
-    public int ScanTypeId { get; set; }
+    public int ScantypeId { get; set; }
 
     public string? Description { get; set; }
 

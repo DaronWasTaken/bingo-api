@@ -1,9 +1,9 @@
-﻿using bingo_api.Models.Entities;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace bingo_api;
+namespace bingo_api.Models;
 
-public partial class BingoDevContext : DbContext
+public partial class BingoDevContext : IdentityDbContext<User>
 {
     public BingoDevContext()
     {
@@ -22,26 +22,25 @@ public partial class BingoDevContext : DbContext
 
     public virtual DbSet<Location> Locations { get; set; }
 
-    public virtual DbSet<Quickplay> Quickplays { get; set; }
+    public virtual DbSet<Quickplay> QuickPlays { get; set; }
 
     public virtual DbSet<QuickplayObject> QuickplayObjects { get; set; }
 
     public virtual DbSet<ScanType> ScanTypes { get; set; }
 
-    public virtual DbSet<TaskModel> Tasks { get; set; }
+    public virtual DbSet<TaskEntity> Tasks { get; set; }
 
     public virtual DbSet<Timely> Timelies { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserAchievement> UserAchievements { get; set; }
 
     public virtual DbSet<UserTask> UserTasks { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseNpgsql("Name=DefaultConnection");
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Achievement>(entity =>
         {
             entity.HasKey(e => e.AchievementId).HasName("achievements_pk");
@@ -78,7 +77,7 @@ public partial class BingoDevContext : DbContext
                 .HasColumnName("imageurl");
         });
 
-        modelBuilder.Entity<Models.Entities.Level>(entity =>
+        modelBuilder.Entity<Level>(entity =>
         {
             entity.HasKey(e => e.LevelNumber).HasName("levels_pk");
 
@@ -119,6 +118,7 @@ public partial class BingoDevContext : DbContext
             entity.Property(e => e.QuickplayId).HasColumnName("quickplayid");
             entity.Property(e => e.LastRefreshDate).HasColumnName("lastrefreshdate");
             entity.Property(e => e.QuickplayObjectId).HasColumnName("quickplayobjectid");
+            entity.Property(e => e.ScanDate).HasColumnName("scandate");
             entity.Property(e => e.UserId).HasColumnName("userid");
 
             entity.HasOne(d => d.QuickplayObject).WithMany(p => p.Quickplays)
@@ -138,16 +138,15 @@ public partial class BingoDevContext : DbContext
 
             entity.ToTable("quickplayobject");
 
-            entity.Property(e => e.QuickplayObjectId).HasColumnName("quickplayid");
+            entity.Property(e => e.QuickplayObjectId).HasColumnName("quickplayobjectid");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .HasColumnName("name");
             entity.Property(e => e.Points).HasColumnName("points");
-            entity.Property(e => e.ScanDate).HasColumnName("scandate");
-            entity.Property(e => e.ScanTypeId).HasColumnName("scantypeid");
+            entity.Property(e => e.ScantypeId).HasColumnName("scantypeid");
 
             entity.HasOne(d => d.ScanType).WithMany(p => p.QuickplayObjects)
-                .HasForeignKey(d => d.ScanTypeId)
+                .HasForeignKey(d => d.ScantypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("quickplay_scanobjects");
         });
@@ -170,7 +169,7 @@ public partial class BingoDevContext : DbContext
                 .HasConstraintName("scanobjects_locations");
         });
 
-        modelBuilder.Entity<TaskModel>(entity =>
+        modelBuilder.Entity<TaskEntity>(entity =>
         {
             entity.HasKey(e => e.TaskId).HasName("achievementtasks_pk");
 
@@ -180,7 +179,7 @@ public partial class BingoDevContext : DbContext
             entity.Property(e => e.AchievementId).HasColumnName("achievementid");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
-            entity.Property(e => e.ScanTypeId).HasColumnName("scantypeid");
+            entity.Property(e => e.ScantypeId).HasColumnName("scantypeid");
 
             entity.HasOne(d => d.Achievement).WithMany(p => p.Tasks)
                 .HasForeignKey(d => d.AchievementId)
@@ -188,7 +187,7 @@ public partial class BingoDevContext : DbContext
                 .HasConstraintName("fk_1");
 
             entity.HasOne(d => d.ScanType).WithMany(p => p.Tasks)
-                .HasForeignKey(d => d.ScanTypeId)
+                .HasForeignKey(d => d.ScantypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_2");
         });
@@ -207,16 +206,11 @@ public partial class BingoDevContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("users_pk");
 
             entity.ToTable("user");
-
-            entity.Property(e => e.UserId).HasColumnName("userid");
+            
             entity.Property(e => e.LevelNumber).HasColumnName("levelnumber");
             entity.Property(e => e.Points).HasColumnName("points");
-            entity.Property(e => e.Username)
-                .HasMaxLength(50)
-                .HasColumnName("username");
 
             entity.HasOne(d => d.LevelNumberNavigation).WithMany(p => p.Users)
                 .HasForeignKey(d => d.LevelNumber)
@@ -235,7 +229,7 @@ public partial class BingoDevContext : DbContext
             entity.Property(e => e.DateEarned)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("dateearned");
-            entity.Property(e => e.UserId).HasColumnName("userid");
+            entity.Property(e => e.Userid).HasColumnName("userid");
 
             entity.HasOne(d => d.Achievement).WithMany(p => p.UserAchievements)
                 .HasForeignKey(d => d.AchievementId)
@@ -243,24 +237,24 @@ public partial class BingoDevContext : DbContext
                 .HasConstraintName("userachievements_achievements");
 
             entity.HasOne(d => d.User).WithMany(p => p.UserAchievements)
-                .HasForeignKey(d => d.UserId)
+                .HasForeignKey(d => d.Userid)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_3");
         });
 
         modelBuilder.Entity<UserTask>(entity =>
         {
-            entity.HasKey(e => e.UserTaskId).HasName("usertask_pk");
+            entity.HasKey(e => e.UserTaskid).HasName("usertask_pk");
 
             entity.ToTable("usertask");
 
-            entity.Property(e => e.UserTaskId).HasColumnName("usertaskid");
+            entity.Property(e => e.UserTaskid).HasColumnName("usertaskid");
             entity.Property(e => e.DateCompleted).HasColumnName("datecompleted");
             entity.Property(e => e.QuantityCompleted).HasColumnName("quantitycompleted");
             entity.Property(e => e.TaskId).HasColumnName("taskid");
             entity.Property(e => e.UserId).HasColumnName("userid");
 
-            entity.HasOne(d => d.TaskModel).WithMany(p => p.UserTasks)
+            entity.HasOne(d => d.TaskEntity).WithMany(p => p.UserTasks)
                 .HasForeignKey(d => d.TaskId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("user_achievement_tasks_achievementtasks");

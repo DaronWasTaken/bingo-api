@@ -1,6 +1,6 @@
-﻿using bingo_api.Models.DTOs;
-using bingo_api.Models.Entities;
-using bingo_api.Models.Views.Responses;
+﻿using bingo_api.Models;
+using bingo_api.Models.DTOs;
+using bingo_api.Models.Views;
 using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.Services;
@@ -14,18 +14,18 @@ public class UserService : IUserService
         _context = context;
     }
 
-    public async Task<LevelWidgetDto> GetUserLevelWidget(int id)
+    public async Task<LevelWidgetDto> GetUserLevelWidget(string id)
     {
         var user = await _context.Users
             .Include(user => user.LevelNumberNavigation)
-            .FirstAsync(user => user.UserId == id);
+            .FirstAsync(user => user.Id.Equals(id));
 
         var levelWidgetDto = new LevelWidgetDto
         {
             Level = user.LevelNumber,
             Points = user.Points,
             RequiredPoints = user.LevelNumberNavigation.RequiredPoints,
-            Username = user.Username
+            Username = user.UserName
         };
         
         return levelWidgetDto;
@@ -40,10 +40,10 @@ public class UserService : IUserService
         return result;
     }
 
-    public async Task<QuickplayScreenDto> GetUserQuickplayScreen(int userId)
+    public async Task<QuickplayScreenDto> GetUserQuickplayScreen(string userId)
     {
         var user = await _context.Users
-            .Where(q => q.UserId == userId)
+            .Where(q => q.Id.Equals(userId))
             .Include(user => user.LevelNumberNavigation)
             .FirstAsync();
         
@@ -52,11 +52,11 @@ public class UserService : IUserService
             Level = user.LevelNumber,
             Points = user.Points,
             RequiredPoints = user.LevelNumberNavigation.RequiredPoints,
-            Username = user.Username
+            Username = user.UserName
         };
 
-        List<QuickplayDto> quickplayDtos = await _context.Quickplays
-            .Where(q => q.UserId == userId)
+        List<QuickplayDto> quickplayDtos = await _context.QuickPlays
+            .Where(q => q.UserId.Equals(userId))
             .Include(q => q.QuickplayObject)
             .Select(q => new QuickplayDto
             {

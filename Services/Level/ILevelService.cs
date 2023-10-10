@@ -1,4 +1,4 @@
-﻿using bingo_api.Models.Entities;
+﻿using bingo_api.Models;
 
 namespace bingo_api.Services;
 

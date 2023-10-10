@@ -1,4 +1,4 @@
-﻿using bingo_api.Models.Entities;
+﻿using bingo_api.Models;
 using bingo_api.Services;
 using Microsoft.AspNetCore.Mvc;
 
