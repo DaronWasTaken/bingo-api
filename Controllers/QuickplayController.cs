@@ -1,9 +1,11 @@
 ﻿using bingo_api.Models;
 using bingo_api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class QuickplayController : ControllerBase

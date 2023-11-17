@@ -2,9 +2,9 @@
 
 namespace bingo_api.Models.Views;
 
-public class UserCredentialsDto
+public class LoginUserDto
 {
-    [Required, MinLength(8), MaxLength(32)]
+    [Required, MaxLength(32)]
     public string Username { get; set; } = null!;
 
     [Required, MinLength(8), MaxLength(32)]
