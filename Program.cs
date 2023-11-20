@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 using bingo_api.Models;
 using bingo_api.Models.Services.Auth;
 using bingo_api.Services;
@@ -10,7 +11,12 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<BingoDevContext>(options =>

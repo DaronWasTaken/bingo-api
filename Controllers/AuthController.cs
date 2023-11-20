@@ -20,6 +20,15 @@ public class AuthController : Controller
         _authService = authService;
     }
 
+    [HttpPost("oauth-login")]
+    public async Task<IActionResult> LoginForm([FromForm] LoginUserDto loginUserDto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        return Ok(await _authService.Login(loginUserDto));
+    }
+    
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginUserDto loginUserDto)
     {

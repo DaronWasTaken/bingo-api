@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text;
 using bingo_api.Models.Views;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 namespace bingo_api.Models.Services.Auth;
@@ -19,14 +18,14 @@ public class AuthService : IAuthService
         _userManager = userManager;
     }
 
-    public async Task<string> Login(LoginUserDto loginUserDto)
+    public async Task<TokenDto> Login(LoginUserDto loginUserDto)
     {
-        var user = await _userManager.FindByNameAsync(loginUserDto.Username);
-
+        var user = await _userManager.FindByNameAsync(loginUserDto.username);
+        
         if (user == null)
             throw new Exception("Incorrect password or username");
 
-        var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginUserDto.Password);
+        var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginUserDto.password);
 
         if (!isPasswordCorrect)
         {
@@ -48,7 +47,7 @@ public class AuthService : IAuthService
         throw new NotImplementedException();
     }
 
-    private string GenerateTokenString(User user)
+    private TokenDto GenerateTokenString(User user)
     {
         var claims = new List<Claim>
         {
@@ -70,6 +69,13 @@ public class AuthService : IAuthService
             signingCredentials: cred
         );
         var tokenString = new JwtSecurityTokenHandler().WriteToken(securityToken);
-        return tokenString;
+
+        var tokenResponse = new TokenDto
+        {
+            access_token = tokenString,
+            expires_in = (int)TimeSpan.FromHours(1).TotalSeconds
+        };
+
+    return tokenResponse;
     }
 }
