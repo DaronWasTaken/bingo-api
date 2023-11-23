@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using bingo_api.Models.Views;
+using bingo_api.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
@@ -10,11 +11,13 @@ namespace bingo_api.Models.Services.Auth;
 public class AuthService : IAuthService
 {
     private readonly IConfiguration _configuration;
+    private readonly IUserService _userService;
     private readonly UserManager<User> _userManager;
 
-    public AuthService(UserManager<User> userManager, IConfiguration configuration)
+    public AuthService(UserManager<User> userManager, IConfiguration configuration, IUserService userService)
     {
         _configuration = configuration;
+        _userService = userService;
         _userManager = userManager;
     }
 
@@ -42,9 +45,25 @@ public class AuthService : IAuthService
         return token;
     }
 
-    public Task Register(LoginUserDto userDto)
+    public async Task<bool> Register(RegisterUserDto userDto)
     {
-        throw new NotImplementedException();
+        var user = new User
+        {
+            UserName = userDto.Username,
+            Email = userDto.Email,
+            LevelNumber = 1,
+            Points = 0
+        };
+
+        var result = await _userManager.CreateAsync(user, userDto.Password);
+
+        if (!result.Succeeded)
+        {
+            return false;
+        }
+
+        await _userService.InitializeNewUserData(user);
+        return true;
     }
 
     private TokenDto GenerateTokenString(User user)

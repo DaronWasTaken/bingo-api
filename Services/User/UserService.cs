@@ -27,8 +27,29 @@ public class UserService : IUserService
             RequiredPoints = user.LevelNumberNavigation.RequiredPoints,
             Username = user.UserName
         };
-        
+
         return levelWidgetDto;
+    }
+
+    public async Task InitializeNewUserData(User user)
+    {
+        var quickplayObjects = await _context.QuickplayObjects
+            .OrderBy(r => EF.Functions.Random())
+            .Take(5)
+            .ToListAsync();
+
+        quickplayObjects.ForEach(o =>
+        {
+            var quickplay = new Quickplay
+            {
+                UserId = user.Id,
+                QuickplayObjectId = o.QuickplayObjectId
+            };
+
+            _context.QuickPlays.Add(quickplay);
+        });
+
+        await _context.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<User>> GetUsersWithQuickplays()
@@ -46,7 +67,7 @@ public class UserService : IUserService
             .Where(q => q.Id.Equals(userId))
             .Include(user => user.LevelNumberNavigation)
             .FirstAsync();
-        
+
         var levelWidgetDto = new LevelWidgetDto
         {
             Level = user.LevelNumber,
@@ -55,7 +76,7 @@ public class UserService : IUserService
             Username = user.UserName
         };
 
-        List<QuickplayDto> quickplayDtos = await _context.QuickPlays
+        var quickplayDtos = await _context.QuickPlays
             .Where(q => q.UserId.Equals(userId))
             .Include(q => q.QuickplayObject)
             .Select(q => new QuickplayDto

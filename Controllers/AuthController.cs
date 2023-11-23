@@ -10,13 +10,11 @@ namespace bingo_api.Controllers;
 public class AuthController : Controller
 {
     private ILogger<AuthController> _logger;
-    private readonly UserManager<User> _userManager;
     private readonly IAuthService _authService;
 
     public AuthController(ILogger<AuthController> logger, UserManager<User> userManager, IAuthService authService)
     {
         _logger = logger;
-        _userManager = userManager;
         _authService = authService;
     }
 
@@ -41,22 +39,14 @@ public class AuthController : Controller
     [HttpPost("register")]
     public async Task<IActionResult> SignUp([FromBody] RegisterUserDto registerUserDto)
     {
-        var user = new User
-        {
-            UserName = registerUserDto.Username,
-            Email = registerUserDto.Email,
-            LevelNumber = 1,
-            Points = 0
-        };
+        var isRegistered = await _authService.Register(registerUserDto);
 
-        var result = await _userManager.CreateAsync(user, registerUserDto.Password);
-
-        if (!result.Succeeded)
+        if (!isRegistered)
         {
-            return BadRequest(result.Errors);
+            return BadRequest("Registration failed");
         }
 
-        return Ok("User created successfully!");
+        return Ok("User has been registered!");
     }
     
 }
