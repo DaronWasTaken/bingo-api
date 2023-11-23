@@ -1,18 +1,18 @@
-﻿namespace bingo_api.Models.Entities;
+﻿namespace bingo_api.Models;
 
 public class UserTask
 {
-    public int UserTaskId { get; set; }
+    public int UserTaskid { get; set; }
 
-    public int UserId { get; set; }
+    public string UserId { get; set; } = null!;
 
     public int TaskId { get; set; }
 
-    public DateOnly DateCompleted { get; set; }
+    public DateTime DateCompleted { get; set; }
 
     public int QuantityCompleted { get; set; }
 
-    public virtual TaskModel TaskModel { get; set; } = null!;
+    public virtual TaskEntity TaskEntity { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;
 }

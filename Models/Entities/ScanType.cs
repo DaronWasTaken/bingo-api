@@ -1,4 +1,4 @@
-﻿namespace bingo_api.Models.Entities;
+﻿namespace bingo_api.Models;
 
 public class ScanType
 {
@@ -14,5 +14,5 @@ public class ScanType
 
     public virtual ICollection<QuickplayObject> QuickplayObjects { get; set; } = new List<QuickplayObject>();
 
-    public virtual ICollection<TaskModel> Tasks { get; set; } = new List<TaskModel>();
+    public virtual ICollection<TaskEntity> Tasks { get; set; } = new List<TaskEntity>();
 }

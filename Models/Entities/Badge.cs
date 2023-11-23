@@ -1,4 +1,4 @@
-﻿namespace bingo_api.Models.Entities;
+﻿namespace bingo_api.Models;
 
 public class Badge
 {

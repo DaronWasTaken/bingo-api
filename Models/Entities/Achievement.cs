@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace bingo_api.Models.Entities;
+﻿namespace bingo_api.Models;
 
 public class Achievement
 {
@@ -18,10 +16,9 @@ public class Achievement
 
     public virtual Badge? Badge { get; set; }
 
-    public virtual ICollection<TaskModel> Tasks { get; set; } = new List<TaskModel>();
+    public virtual ICollection<TaskEntity> Tasks { get; set; } = new List<TaskEntity>();
 
     public virtual Timely? Timely { get; set; }
 
-    [JsonIgnore]
     public virtual ICollection<UserAchievement> UserAchievements { get; set; } = new List<UserAchievement>();
 }

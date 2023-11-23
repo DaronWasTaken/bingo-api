@@ -1,10 +1,10 @@
-﻿namespace bingo_api.Models.Entities;
+﻿namespace bingo_api.Models;
 
 public class UserAchievement
 {
     public int UserAchievementId { get; set; }
 
-    public int UserId { get; set; }
+    public string Userid { get; set; } = null!;
 
     public int AchievementId { get; set; }
 

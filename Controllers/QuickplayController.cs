@@ -1,6 +1,6 @@
-﻿using bingo_api.Models.Entities;
+﻿using bingo_api.Models;
 using bingo_api.Services;
-using bingo_api.Services.Quickplay;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.Controllers;
@@ -22,7 +22,7 @@ public class QuickplayController : ControllerBase
     {
         return Ok(await _quickplayRepository.GetAllAsync());
     }
-
+    
     [HttpPost("award/{quickplayId:int}")]
     public async Task<IActionResult> AwardQuickplayByQuickplayId(int quickplayId)
     {

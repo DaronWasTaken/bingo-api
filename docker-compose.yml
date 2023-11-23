@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   api:
-    image: daronwastaken/bingo-api:<tag>
+    image: daronwastaken/bingo-api:${DOCKER_IMAGE_TAG}
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,14 +11,17 @@ services:
     depends_on:
       - db
     environment:
-      - ConnectionStrings:DefaultConnection=<connection_string>;
+      - ConnectionStrings:DefaultConnection=Host=host.docker.internal;Port=5432;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=${POSTGRES_DB};
+      - Jwt:Key=${JWT_KEY}
   
   db:
     image: postgres:latest
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
 

@@ -1,4 +1,4 @@
-﻿using bingo_api.Services.Quickplay;
+﻿using bingo_api.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.Services;
@@ -16,7 +16,7 @@ public class QuickplayService : IQuickplayService
 
     public async Task AwardQuickplay(int id)
     {
-        var result = await _context.Quickplays
+        var result = await _context.QuickPlays
             .Where(q => q.QuickplayId == id)
             .Include(q => q.User.LevelNumberNavigation)
             .Select(q => new
@@ -34,8 +34,8 @@ public class QuickplayService : IQuickplayService
 
         await _levelService.AssignPointsToUser(result.User, result.QuickplayObject.Points);
 
-        var associatedQuickplayObjectIds = await _context.Quickplays
-            .Where(q => q.UserId == result.User.UserId)
+        var associatedQuickplayObjectIds = await _context.QuickPlays
+            .Where(q => q.UserId.Equals(result.User.Id))
             .Select(q => q.QuickplayObject.QuickplayObjectId)
             .ToListAsync();
 
@@ -44,20 +44,20 @@ public class QuickplayService : IQuickplayService
             .OrderByDescending(r => r.Points)
             .FirstOrDefaultAsync();
 
-        _context.Quickplays.Remove(result.Quickplay);
+        _context.QuickPlays.Remove(result.Quickplay);
 
         if (newQuickplayObject == null)
         {
             throw new Exception("Couldn't assign new quickplayObject to user");
         }
         
-        var newQuickplay = new Models.Entities.Quickplay
+        var newQuickplay = new Quickplay
         {
             User = result.User,
             QuickplayObject = newQuickplayObject
         };
         
-        _context.Quickplays.Add(newQuickplay);
+        _context.QuickPlays.Add(newQuickplay);
 
         await _context.SaveChangesAsync();
     }
