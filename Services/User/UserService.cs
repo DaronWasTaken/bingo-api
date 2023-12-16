@@ -96,4 +96,44 @@ public class UserService : IUserService
 
         return quickplayScreenDto;
     }
+
+    public async Task<AchievementScreenDto> GetUserAchievementScreen(string userId)
+    {
+        var user = await _context.Users
+            .Where(u => u.Id.Equals(userId))
+            .FirstOrDefaultAsync();
+        
+        //retrieve all achievements and user achievements for the given user
+        var achievements = await _context.Achievements
+            .Include(a => a.UserAchievements)
+            .Where(a => a.UserAchievements.Any(ua => ua.Userid == userId))
+            .ToListAsync();
+
+        var achievementDtos = new List<AchievementDto>();
+
+        foreach (var achievement in achievements)
+        {
+            var userAchievement = achievement.UserAchievements.FirstOrDefault(ua => ua.Userid == userId);
+
+            var achievementDto = new AchievementDto
+            {
+                AchievementId = achievement.AchievementId,
+                Name = achievement.Name,
+                Description = achievement.Description,
+                Points = achievement.Points,
+                DateEarned = userAchievement?.DateEarned,
+                IsAchieved = userAchievement != null 
+            };
+
+            achievementDtos.Add(achievementDto);
+        }
+
+        var achievementScreenDto = new AchievementScreenDto
+        {
+            UserId = userId,
+            Achievements = achievementDtos
+        };
+
+        return achievementScreenDto;
+    }
 }
