@@ -1,4 +1,5 @@
-﻿using bingo_api.Models;
+﻿using System.Text.Json;
+using bingo_api.Models;
 using bingo_api.Models.DTOs;
 using bingo_api.Models.Views;
 using Microsoft.EntityFrameworkCore;
@@ -97,23 +98,24 @@ public class UserService : IUserService
         return quickplayScreenDto;
     }
 
+    /*
+     * Retrieves a user's achievement screen, indicating which achievements are achieved by the user
+     */
     public async Task<AchievementScreenDto> GetUserAchievementScreen(string userId)
     {
-        var user = await _context.Users
-            .Where(u => u.Id.Equals(userId))
-            .FirstOrDefaultAsync();
-        
-        //retrieve all achievements and user achievements for the given user
         var achievements = await _context.Achievements
-            .Include(a => a.UserAchievements)
-            .Where(a => a.UserAchievements.Any(ua => ua.Userid == userId))
+            .Include(a => a.Badge) 
+            .ToListAsync();
+
+        var userAchievements = await _context.UserAchievements
+            .Where(ua => ua.Userid == userId)
             .ToListAsync();
 
         var achievementDtos = new List<AchievementDto>();
 
         foreach (var achievement in achievements)
         {
-            var userAchievement = achievement.UserAchievements.FirstOrDefault(ua => ua.Userid == userId);
+            var userAchievement = userAchievements.FirstOrDefault(ua => ua.AchievementId == achievement.AchievementId);
 
             var achievementDto = new AchievementDto
             {
@@ -122,7 +124,8 @@ public class UserService : IUserService
                 Description = achievement.Description,
                 Points = achievement.Points,
                 DateEarned = userAchievement?.DateEarned,
-                IsAchieved = userAchievement != null 
+                BadgeUrl = achievement.Badge?.ImageUrl,
+                IsAchieved = userAchievement != null
             };
 
             achievementDtos.Add(achievementDto);
@@ -133,7 +136,8 @@ public class UserService : IUserService
             UserId = userId,
             Achievements = achievementDtos
         };
-
+        
         return achievementScreenDto;
     }
+
 }
