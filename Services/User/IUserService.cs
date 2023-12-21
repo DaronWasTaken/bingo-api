@@ -1,4 +1,5 @@
 ﻿using bingo_api.Models;
+using bingo_api.Models.DTOs;
 using bingo_api.Models.Views;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,4 +11,6 @@ public interface IUserService
     public Task<IEnumerable<User>> GetUsersWithQuickplays();
     public Task<LevelWidgetDto> GetUserLevelWidget(string id);
     public Task<QuickplayScreenDto> GetUserQuickplayScreen(string userId);
+    public Task<AchievementScreenDto> GetUserAchievementScreen(string userId);
+
 }

@@ -1,4 +1,5 @@
-﻿using bingo_api.Models;
+﻿using System.Text.Json;
+using bingo_api.Models;
 using bingo_api.Models.DTOs;
 using bingo_api.Models.Views;
 using Microsoft.EntityFrameworkCore;
@@ -96,4 +97,47 @@ public class UserService : IUserService
 
         return quickplayScreenDto;
     }
+
+    /*
+     * Retrieves a user's achievement screen, indicating which achievements are achieved by the user
+     */
+    public async Task<AchievementScreenDto> GetUserAchievementScreen(string userId)
+    {
+        var achievements = await _context.Achievements
+            .Include(a => a.Badge) 
+            .ToListAsync();
+
+        var userAchievements = await _context.UserAchievements
+            .Where(ua => ua.Userid == userId)
+            .ToListAsync();
+
+        var achievementDtos = new List<AchievementDto>();
+
+        foreach (var achievement in achievements)
+        {
+            var userAchievement = userAchievements.FirstOrDefault(ua => ua.AchievementId == achievement.AchievementId);
+
+            var achievementDto = new AchievementDto
+            {
+                AchievementId = achievement.AchievementId,
+                Name = achievement.Name,
+                Description = achievement.Description,
+                Points = achievement.Points,
+                DateEarned = userAchievement?.DateEarned,
+                BadgeUrl = achievement.Badge?.ImageUrl,
+                IsAchieved = userAchievement != null
+            };
+
+            achievementDtos.Add(achievementDto);
+        }
+
+        var achievementScreenDto = new AchievementScreenDto
+        {
+            UserId = userId,
+            Achievements = achievementDtos
+        };
+        
+        return achievementScreenDto;
+    }
+
 }
