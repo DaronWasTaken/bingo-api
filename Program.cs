@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using bingo_api.Models;
@@ -36,14 +37,24 @@ builder.Services.AddAuthentication(options =>
     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateActor = true,
-        ValidateIssuer = true,
-        ValidateAudience = true,
         ValidateIssuerSigningKey = true,
         RequireExpirationTime = true,
-        ValidIssuer = builder.Configuration.GetSection("Jwt:Issuer").Value,
-        ValidAudience = builder.Configuration.GetSection("Jwt:Audience").Value,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
         IssuerSigningKey = key
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = context =>
+        {
+            if (context.Principal?.Identity is not ClaimsIdentity claims) return Task.CompletedTask;
+            var tokenType = claims.FindFirst("token_type");
+            if (tokenType is not { Value: "refresh_token" }) return Task.CompletedTask;
+            context.Fail("Unauthorized: Token is a refresh token");
+            return Task.CompletedTask;
+
+        }
     };
 });
 

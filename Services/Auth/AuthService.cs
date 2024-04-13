@@ -21,10 +21,10 @@ public class AuthService : IAuthService
         _userManager = userManager;
     }
 
-    public async Task<TokenDto> Login(LoginUserDto loginUserDto)
+    public async Task<TokenDto?> Login(LoginUserDto loginUserDto)
     {
         var user = await _userManager.FindByNameAsync(loginUserDto.username);
-        
+
         if (user == null)
             throw new Exception("Incorrect password or username");
 
@@ -66,6 +66,11 @@ public class AuthService : IAuthService
         return true;
     }
 
+    public Task<TokenDto> Refresh(string refreshToken)
+    {
+        throw new NotImplementedException();
+    }
+
     private TokenDto GenerateTokenString(User user)
     {
         var claims = new List<Claim>
@@ -95,6 +100,6 @@ public class AuthService : IAuthService
             expires_in = (int)TimeSpan.FromHours(1).TotalSeconds
         };
 
-    return tokenResponse;
+        return tokenResponse;
     }
 }
