@@ -1,28 +1,30 @@
 ﻿using bingo_api.Models;
+using bingo_api.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using Npgsql.Internal.TypeHandlers;
 
 namespace bingo_api.Services;
 
 public class QuickplayService : IQuickplayService
 {
-    private readonly BingoDevContext _context;
+    private readonly PostgresContext _context;
     private readonly ILevelService _levelService;
 
-    public QuickplayService(BingoDevContext context, ILevelService levelService)
+    public QuickplayService(PostgresContext context, ILevelService levelService)
     {
         _context = context;
         _levelService = levelService;
     }
 
-    public async Task AwardQuickplay(int id)
+    public async Task AwardQuickplay(string id)
     {
-        var result = await _context.QuickPlays
-            .Where(q => q.QuickplayId == id)
-            .Include(q => q.User.LevelNumberNavigation)
+        var result = await _context.UserItems
+            .Where(q => q.Id == id)
+            .Include(q => q.User.Level)
             .Select(q => new
             {
-                Quickplay = q,
-                q.QuickplayObject,
+                UserItem = q,
+                q.Item,
                 q.User
             })
             .FirstOrDefaultAsync();
@@ -32,32 +34,33 @@ public class QuickplayService : IQuickplayService
             throw new KeyNotFoundException("Quickplay was not found");
         }
 
-        await _levelService.AssignPointsToUser(result.User, result.QuickplayObject.Points);
+        await _levelService.AssignPointsToUser(result.User, result.Item.Points);
 
-        var associatedQuickplayObjectIds = await _context.QuickPlays
+        var otherQuickplayItemIds = await _context.UserItems
             .Where(q => q.UserId.Equals(result.User.Id))
-            .Select(q => q.QuickplayObject.QuickplayObjectId)
+            .Select(q => q.Item.Id)
             .ToListAsync();
 
-        var newQuickplayObject = await _context.QuickplayObjects
-            .Where(qo => !associatedQuickplayObjectIds.Contains(qo.QuickplayObjectId))
+        var nextItem = await _context.Items
+            .Where(qo => !otherQuickplayItemIds.Contains(qo.Id))
             .OrderByDescending(r => r.Points)
             .FirstOrDefaultAsync();
 
-        _context.QuickPlays.Remove(result.Quickplay);
+        _context.UserItems.Remove(result.UserItem);
 
-        if (newQuickplayObject == null)
+        if (nextItem == null)
         {
             throw new Exception("Couldn't assign new quickplayObject to user");
         }
         
-        var newQuickplay = new Quickplay
+        var newQuickplayItem = new UserItem
         {
+            Id = Guid.NewGuid().ToString(),
             User = result.User,
-            QuickplayObject = newQuickplayObject
+            Item = nextItem
         };
         
-        _context.QuickPlays.Add(newQuickplay);
+        _context.UserItems.Add(newQuickplayItem);
 
         await _context.SaveChangesAsync();
     }

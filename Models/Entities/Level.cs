@@ -1,10 +1,13 @@
-﻿namespace bingo_api.Models;
+﻿using System;
+using System.Collections.Generic;
 
-public class Level
+namespace bingo_api.Models.Entities;
+
+public partial class Level
 {
-    public int LevelNumber { get; set; }
+    public int Id { get; set; }
 
     public int RequiredPoints { get; set; }
 
-    public virtual ICollection<User> Users { get; set; } = new List<User>();
+    public virtual ICollection<User> Usrs { get; set; } = new List<User>();
 }

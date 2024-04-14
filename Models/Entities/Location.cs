@@ -1,18 +1,17 @@
-﻿namespace bingo_api.Models;
+﻿using System;
+using System.Collections.Generic;
 
-public class Location
+namespace bingo_api.Models.Entities;
+
+public partial class Location
 {
-    public int LocationId { get; set; }
+    public string Id { get; set; } = null!;
 
-    public string Name { get; set; } = null!;
-
-    public string? Description { get; set; }
+    public int Radius { get; set; }
 
     public decimal Latitude { get; set; }
 
     public decimal Longitude { get; set; }
 
-    public decimal Radius { get; set; }
-
-    public virtual ICollection<ScanType> ScanTypes { get; set; } = new List<ScanType>();
+    public virtual ICollection<Subtask> Subtasks { get; set; } = new List<Subtask>();
 }

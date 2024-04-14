@@ -7,7 +7,7 @@ public class AchievementDto
     public string? Description { get; set; }
     public int Points  { get; set; }
     public string? BadgeUrl { get; set; }
-    public DateTime? DateEarned { get; set; }
+    public DateOnly? DateEarned { get; set; }
     public Boolean IsAchieved { get; set; }
     
 }

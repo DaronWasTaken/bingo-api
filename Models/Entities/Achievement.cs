@@ -1,24 +1,23 @@
-﻿namespace bingo_api.Models;
+﻿using System;
+using System.Collections.Generic;
 
-public class Achievement
+namespace bingo_api.Models.Entities;
+
+public partial class Achievement
 {
-    public int AchievementId { get; set; }
-
-    public int? BadgeId { get; set; }
-
-    public int? TimelyId { get; set; }
+    public int Id { get; set; }
 
     public string Name { get; set; } = null!;
 
-    public string? Description { get; set; }
+    public string Description { get; set; } = null!;
+
+    public string BadgeFile { get; set; } = null!;
 
     public int Points { get; set; }
 
-    public virtual Badge? Badge { get; set; }
+    public int TotalSubtasks { get; set; }
 
-    public virtual ICollection<TaskEntity> Tasks { get; set; } = new List<TaskEntity>();
-
-    public virtual Timely? Timely { get; set; }
+    public virtual ICollection<Subtask> Subtasks { get; set; } = new List<Subtask>();
 
     public virtual ICollection<UserAchievement> UserAchievements { get; set; } = new List<UserAchievement>();
 }
