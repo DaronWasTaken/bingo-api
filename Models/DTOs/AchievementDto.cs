@@ -6,8 +6,10 @@ public class AchievementDto
     public string Name { get; set; }
     public string? Description { get; set; }
     public int Points  { get; set; }
-    public string? BadgeUrl { get; set; }
+    public string? BadgeFile { get; set; }
+    public int TotalSubtasks { get; set; }
+    public int CompletedSubtasks { get; set; }
     public DateOnly? DateEarned { get; set; }
-    public Boolean IsAchieved { get; set; }
+    public bool IsAchieved { get; set; }
     
 }

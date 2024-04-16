@@ -45,5 +45,12 @@ public class UserController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         return Ok(await _userService.GetUserAchievementScreen(userId));
     }
+
+    [HttpGet("achievement/{achievementId:int}")]
+    public async Task<IActionResult> GetUserAchievementDetailsScreen([FromRoute] int achievementId)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return Ok(await _userService.GetUserAchievementDetailsScreen(userId, achievementId));
+    }
     
 }

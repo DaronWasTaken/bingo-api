@@ -1,6 +1,7 @@
 ﻿using bingo_api.Models.DTOs;
 using bingo_api.Models.Entities;
 using bingo_api.Models.Views;
+using bingo_api.Models.Views.Responses;
 using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.Services;
@@ -50,6 +51,32 @@ public class UserService : IUserService
             _context.UserItems.Add(item);
         });
 
+        await _context.Achievements
+            .Include(a => a.Subtasks)
+            .ForEachAsync(async a =>
+            {
+                var userAchievementId = Guid.NewGuid().ToString();
+                await _context.UserAchievements.AddAsync(new UserAchievement
+                {
+                    Id = userAchievementId,
+                    UserId = user.Id,
+                    AchievementId = a.Id,
+                    CompletedSubtasks = 0,
+                    CompletionDate = null
+                });
+                
+                foreach (var subtask in a.Subtasks)
+                {
+                    await _context.UserSubtasks.AddAsync(new UserSubtask
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        UserAchievementId = userAchievementId,
+                        SubtaskId = subtask.Id,
+                        NumberCompleted = 0
+                    });
+                }
+            });
+        
         await _context.SaveChangesAsync();
     }
 
@@ -103,40 +130,61 @@ public class UserService : IUserService
      */
     public async Task<AchievementScreenDto> GetUserAchievementScreen(string userId)
     {
-        var achievements = await _context.Achievements
-            .ToListAsync();
-
         var userAchievements = await _context.UserAchievements
             .Where(ua => ua.UserId == userId)
+            .Include(ua => ua.Achievement)
+            .Select(ua => new AchievementDto
+            {
+                AchievementId = ua.AchievementId,
+                Name = ua.Achievement.Name,
+                Description = ua.Achievement.Description,
+                Points = ua.Achievement.Points,
+                TotalSubtasks = ua.Achievement.TotalSubtasks,
+                CompletedSubtasks = ua.CompletedSubtasks,
+                BadgeFile = ua.Achievement.BadgeFile,
+                IsAchieved = ua.Achievement.TotalSubtasks - ua.CompletedSubtasks == 0,
+                DateEarned = ua.CompletionDate
+            })
             .ToListAsync();
 
-        var achievementDtos = new List<AchievementDto>();
-
-        foreach (var achievement in achievements)
-        {
-            var userAchievement = userAchievements.FirstOrDefault(ua => ua.AchievementId == achievement.Id);
-
-            var achievementDto = new AchievementDto
-            {
-                AchievementId = achievement.Id,
-                Name = achievement.Name,
-                Description = achievement.Description,
-                Points = achievement.Points,
-                DateEarned = userAchievement?.CompletionDate,
-                BadgeUrl = achievement.BadgeFile,
-                IsAchieved = userAchievement != null
-            };
-
-            achievementDtos.Add(achievementDto);
-        }
-
-        var achievementScreenDto = new AchievementScreenDto
+        return new AchievementScreenDto
         {
             UserId = userId,
-            Achievements = achievementDtos
+            Achievements = userAchievements
         };
-        
-        return achievementScreenDto;
     }
 
+    public async Task<AchievementDetailsScreenDto> GetUserAchievementDetailsScreen(string userId, int achievementId)
+    {
+        var achievementDetailsScreenDto = await _context.UserAchievements
+            .Include(ua => ua.Achievement)
+            .Where(ua => ua.AchievementId == achievementId && ua.UserId == userId)
+            .Select(ua => new AchievementDetailsScreenDto
+            {
+                UserAchievementId = ua.Id,
+                Name = ua.Achievement.Name,
+                Description = ua.Achievement.Description,
+                Points = ua.Achievement.Points
+            })
+            .FirstAsync();
+
+        var subtaskDtos = await _context.UserSubtasks
+            .Include(us => us.Subtask)
+            .Where(us => us.Subtask.AchievementId == achievementId)
+            .Select(us => new SubtaskDto
+            {
+                UserSubtaskId = us.Id,
+                Name = us.Subtask.Name,
+                Description = us.Subtask.Description,
+                CompletedNumber = us.NumberCompleted,
+                TotalNumber = us.Subtask.TotalNumber,
+                ImagePath = us.Subtask.ImageFile,
+                Location = us.Subtask.LocationId,
+                ItemId = us.Subtask.ItemId
+            })
+            .ToListAsync();
+
+        achievementDetailsScreenDto.Subtasks = subtaskDtos;
+        return achievementDetailsScreenDto;
+    }
 }
