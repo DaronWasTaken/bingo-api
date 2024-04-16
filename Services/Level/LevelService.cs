@@ -1,12 +1,12 @@
-﻿using bingo_api.Models;
+﻿using bingo_api.Models.Entities;
 
 namespace bingo_api.Services;
 
 public class LevelService : ILevelService
 {
-    private readonly BingoDevContext _context;
+    private readonly PostgresContext _context;
     
-    public LevelService(BingoDevContext context)
+    public LevelService(PostgresContext context)
     {
         _context = context;
     }
@@ -14,17 +14,17 @@ public class LevelService : ILevelService
     public async Task AssignPointsToUser(User user, int points)
     {
         user.Points += points;
-        var pointsSurplus = user.Points - user.LevelNumberNavigation.RequiredPoints;
+        var pointsSurplus = user.Points - user.Level.RequiredPoints;
         if (pointsSurplus >= 0)
         {
-            if (await _context.Levels.FindAsync(user.LevelNumber + 1) != null)
+            if (await _context.Levels.FindAsync(user.LevelId + 1) != null)
             {
-                user.LevelNumber += 1;
+                user.LevelId += 1;
                 user.Points = pointsSurplus;
             }
             else
             {
-                user.Points = user.LevelNumberNavigation.RequiredPoints;
+                user.Points = user.Level.RequiredPoints;
             }
         }
     }

@@ -2,8 +2,8 @@
 
 public class QuickplayDto
 {
-    public int QuickplayId { get; set; }
-    public int QuickplayObjectId { get; set; }
+    public string QuickplayId { get; set; }
+    public string QuickplayObjectId { get; set; }
     public string Name { get; set; }
     public int Points { get; set; }
 }

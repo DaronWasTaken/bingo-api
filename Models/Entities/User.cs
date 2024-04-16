@@ -1,18 +1,23 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System;
+using System.Collections.Generic;
 
-namespace bingo_api.Models;
+namespace bingo_api.Models.Entities;
 
-public class User : IdentityUser
+public partial class User
 {
-    public int LevelNumber { get; set; }
+    public string Id { get; set; } = null!;
+
+    public string Username { get; set; } = null!;
+
+    public string PasswordHash { get; set; } = null!;
 
     public int Points { get; set; }
 
-    public virtual Level LevelNumberNavigation { get; set; } = null!;
+    public int LevelId { get; set; }
 
-    public virtual ICollection<Quickplay> Quickplays { get; set; } = new List<Quickplay>();
+    public virtual Level Level { get; set; } = null!;
 
     public virtual ICollection<UserAchievement> UserAchievements { get; set; } = new List<UserAchievement>();
 
-    public virtual ICollection<UserTask> UserTasks { get; set; } = new List<UserTask>();
+    public virtual ICollection<UserItem> UserItems { get; set; } = new List<UserItem>();
 }

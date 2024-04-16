@@ -9,24 +9,16 @@ namespace bingo_api.Controllers;
 [Route("[controller]")]
 public class QuickplayController : ControllerBase
 {
-    private readonly IRepository<Quickplay> _quickplayRepository;
     private readonly IQuickplayService _quickplayService;
-    public QuickplayController(IRepository<Quickplay> quickplayRepository, IQuickplayService quickplayService)
+    public QuickplayController(IQuickplayService quickplayService)
     {
-        _quickplayRepository = quickplayRepository;
         _quickplayService = quickplayService;
     }
-
-    [HttpGet]
-    public async Task<IActionResult> GetQuickplay()
-    {
-        return Ok(await _quickplayRepository.GetAllAsync());
-    }
     
-    [HttpPost("award/{quickplayId:int}")]
-    public async Task<IActionResult> AwardQuickplayByQuickplayId(int quickplayId)
+    [HttpPost("award/{id}")]
+    public async Task<IActionResult> AwardQuickplayByQuickplayId(string id)
     {
-        await _quickplayService.AwardQuickplay(quickplayId);
+        await _quickplayService.AwardQuickplay(id);
         return NoContent();
     }
 }

@@ -1,100 +1,80 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using System.Net;
+using System.Text.Json;
+using bingo_api.Models.Entities;
 using bingo_api.Models.Views;
 using bingo_api.Services;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
+using BadHttpRequestException = Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException;
 
 namespace bingo_api.Models.Services.Auth;
 
 public class AuthService : IAuthService
 {
-    private readonly IConfiguration _configuration;
     private readonly IUserService _userService;
-    private readonly UserManager<User> _userManager;
+    private readonly string _baseUri;
 
-    public AuthService(UserManager<User> userManager, IConfiguration configuration, IUserService userService)
+    public AuthService(IConfiguration configuration, IUserService userService)
     {
-        _configuration = configuration;
         _userService = userService;
-        _userManager = userManager;
+        _baseUri = configuration.GetValue<string>("AUTH_URI");
     }
 
-    public async Task<TokenDto> Login(LoginUserDto loginUserDto)
+    public async Task<TokenDto> Login(LoginUserDto userDto)
     {
-        var user = await _userManager.FindByNameAsync(loginUserDto.username);
+        var uri = _baseUri + "/login";
+        var client = new HttpClient();
+        var form = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
+        {
+            new("username", userDto.username),
+            new("password", userDto.password)
+        });
+        var res = await client.PostAsync(uri, form);
+        res.EnsureSuccessStatusCode();
+        var resBody = await res.Content.ReadAsStringAsync();
+        var tokenDto = JsonSerializer.Deserialize<TokenDto>(resBody);
+        return tokenDto;
+    }
+    
+    public async Task Register(RegisterUserDto userDto)
+    {
+        var uri = _baseUri + "/register";
+        var client = new HttpClient();
         
-        if (user == null)
-            throw new Exception("Incorrect password or username");
+        var res = await client.PostAsJsonAsync(uri, userDto);
 
-        var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginUserDto.password);
-
-        if (!isPasswordCorrect)
+        if (res.StatusCode == HttpStatusCode.BadRequest)
         {
-            throw new UnauthorizedAccessException("Incorrect password or username");
+            throw new Microsoft.AspNetCore.Http.BadHttpRequestException("Username already exists");
         }
 
-        var token = GenerateTokenString(user);
-
-        if (token == null)
+        if (res.StatusCode != HttpStatusCode.OK)
         {
-            throw new Exception("GenerateTokenException");
+            throw new HttpRequestException("Could not register the user");
         }
 
-        return token;
-    }
-
-    public async Task<bool> Register(RegisterUserDto userDto)
-    {
         var user = new User
         {
-            UserName = userDto.Username,
-            Email = userDto.Email,
-            LevelNumber = 1,
+            Id = await res.Content.ReadAsStringAsync(),
+            Username = userDto.Username,
+            PasswordHash = userDto.Password,
+            LevelId = 1,
             Points = 0
         };
-
-        var result = await _userManager.CreateAsync(user, userDto.Password);
-
-        if (!result.Succeeded)
-        {
-            return false;
-        }
-
+        
         await _userService.InitializeNewUserData(user);
-        return true;
     }
 
-    private TokenDto GenerateTokenString(User user)
+    public async Task<TokenDto> Refresh(string refreshToken)
     {
-        var claims = new List<Claim>
+        var uri = _baseUri + "/refresh";
+        var client = new HttpClient();
+        var form = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
         {
-            new(JwtRegisteredClaimNames.Sub, user.Id),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(JwtRegisteredClaimNames.Iat, DateTimeOffset.Now.ToUnixTimeSeconds().ToString())
-        };
-
-        var keyString = _configuration.GetValue<string>("Jwt:Key");
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
-        var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        //TODO: Parametrize the fuck out of it
-        SecurityToken securityToken = new JwtSecurityToken(
-            claims: claims,
-            expires: DateTime.Now.AddMinutes(60),
-            issuer: _configuration.GetValue<string>("Jwt:Issuer"),
-            audience: _configuration.GetValue<string>("Jwt:Audience"),
-            signingCredentials: cred
-        );
-        var tokenString = new JwtSecurityTokenHandler().WriteToken(securityToken);
-
-        var tokenResponse = new TokenDto
-        {
-            access_token = tokenString,
-            expires_in = (int)TimeSpan.FromHours(1).TotalSeconds
-        };
-
-    return tokenResponse;
+            new("refresh_token", refreshToken),
+        });
+        var res = await client.PostAsync(uri, form);
+        res.EnsureSuccessStatusCode();
+        var resBody = await res.Content.ReadAsStringAsync();
+        var tokenDto = JsonSerializer.Deserialize<TokenDto>(resBody);
+        return tokenDto;
     }
 }

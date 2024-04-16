@@ -1,6 +1,5 @@
-﻿using System.Text.Json;
-using bingo_api.Models;
-using bingo_api.Models.DTOs;
+﻿using bingo_api.Models.DTOs;
+using bingo_api.Models.Entities;
 using bingo_api.Models.Views;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,25 +7,25 @@ namespace bingo_api.Services;
 
 public class UserService : IUserService
 {
-    private readonly BingoDevContext _context;
+    private readonly PostgresContext _context;
 
-    public UserService(BingoDevContext context)
+    public UserService(PostgresContext context)
     {
         _context = context;
     }
 
-    public async Task<LevelWidgetDto> GetUserLevelWidget(string id)
+    public async Task<LevelWidgetDto> GetUserLevelWidget(string userId)
     {
         var user = await _context.Users
-            .Include(user => user.LevelNumberNavigation)
-            .FirstAsync(user => user.Id.Equals(id));
+            .Include(user => user.Level)
+            .FirstAsync(user => user.Id.Equals(userId));
 
         var levelWidgetDto = new LevelWidgetDto
         {
-            Level = user.LevelNumber,
+            Level = user.LevelId,
             Points = user.Points,
-            RequiredPoints = user.LevelNumberNavigation.RequiredPoints,
-            Username = user.UserName
+            RequiredPoints = user.Level.RequiredPoints,
+            Username = user.Username
         };
 
         return levelWidgetDto;
@@ -34,20 +33,21 @@ public class UserService : IUserService
 
     public async Task InitializeNewUserData(User user)
     {
-        var quickplayObjects = await _context.QuickplayObjects
+        var items = await _context.Items
             .OrderBy(r => EF.Functions.Random())
             .Take(5)
             .ToListAsync();
 
-        quickplayObjects.ForEach(o =>
+        items.ForEach(o =>
         {
-            var quickplay = new Quickplay
+            var item = new UserItem
             {
+                Id = Guid.NewGuid().ToString(),
                 UserId = user.Id,
-                QuickplayObjectId = o.QuickplayObjectId
+                ItemId = o.Id
             };
 
-            _context.QuickPlays.Add(quickplay);
+            _context.UserItems.Add(item);
         });
 
         await _context.SaveChangesAsync();
@@ -56,8 +56,8 @@ public class UserService : IUserService
     public async Task<IEnumerable<User>> GetUsersWithQuickplays()
     {
         var result = await _context.Users
-            .Include(q => q.Quickplays)
-            .ThenInclude(q => q.QuickplayObject)
+            .Include(q => q.UserItems)
+            .ThenInclude(q => q.Item)
             .ToListAsync();
         return result;
     }
@@ -66,26 +66,26 @@ public class UserService : IUserService
     {
         var user = await _context.Users
             .Where(q => q.Id.Equals(userId))
-            .Include(user => user.LevelNumberNavigation)
+            .Include(user => user.Level)
             .FirstAsync();
 
         var levelWidgetDto = new LevelWidgetDto
         {
-            Level = user.LevelNumber,
+            Level = user.LevelId,
             Points = user.Points,
-            RequiredPoints = user.LevelNumberNavigation.RequiredPoints,
-            Username = user.UserName
+            RequiredPoints = user.Level.RequiredPoints,
+            Username = user.Username
         };
 
-        var quickplayDtos = await _context.QuickPlays
+        var quickplayDtos = await _context.UserItems
             .Where(q => q.UserId.Equals(userId))
-            .Include(q => q.QuickplayObject)
+            .Include(q => q.Item)
             .Select(q => new QuickplayDto
             {
-                QuickplayId = q.QuickplayId,
-                QuickplayObjectId = q.QuickplayObjectId,
-                Name = q.QuickplayObject.Name,
-                Points = q.QuickplayObject.Points
+                QuickplayId = q.Id,
+                QuickplayObjectId = q.ItemId,
+                Name = q.Item.Name,
+                Points = q.Item.Points
             }).ToListAsync();
 
         var quickplayScreenDto = new QuickplayScreenDto
@@ -104,27 +104,26 @@ public class UserService : IUserService
     public async Task<AchievementScreenDto> GetUserAchievementScreen(string userId)
     {
         var achievements = await _context.Achievements
-            .Include(a => a.Badge) 
             .ToListAsync();
 
         var userAchievements = await _context.UserAchievements
-            .Where(ua => ua.Userid == userId)
+            .Where(ua => ua.UserId == userId)
             .ToListAsync();
 
         var achievementDtos = new List<AchievementDto>();
 
         foreach (var achievement in achievements)
         {
-            var userAchievement = userAchievements.FirstOrDefault(ua => ua.AchievementId == achievement.AchievementId);
+            var userAchievement = userAchievements.FirstOrDefault(ua => ua.AchievementId == achievement.Id);
 
             var achievementDto = new AchievementDto
             {
-                AchievementId = achievement.AchievementId,
+                AchievementId = achievement.Id,
                 Name = achievement.Name,
                 Description = achievement.Description,
                 Points = achievement.Points,
-                DateEarned = userAchievement?.DateEarned,
-                BadgeUrl = achievement.Badge?.ImageUrl,
+                DateEarned = userAchievement?.CompletionDate,
+                BadgeUrl = achievement.BadgeFile,
                 IsAchieved = userAchievement != null
             };
 

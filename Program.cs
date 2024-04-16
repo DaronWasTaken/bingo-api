@@ -1,10 +1,10 @@
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
-using bingo_api.Models;
+using bingo_api.Models.Entities;
 using bingo_api.Models.Services.Auth;
 using bingo_api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -19,12 +19,8 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<BingoDevContext>(options =>
+builder.Services.AddDbContext<PostgresContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddIdentity<User, IdentityRole>()
-    .AddEntityFrameworkStores<BingoDevContext>()
-    .AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -34,20 +30,37 @@ builder.Services.AddAuthentication(options =>
 {
     var keyString = builder.Configuration.GetValue<string>("Jwt:Key");
     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateActor = true,
-        ValidateIssuer = true,
-        ValidateAudience = true,
         ValidateIssuerSigningKey = true,
+        ValidateAudience = false,
+        ValidateIssuer = false,
         RequireExpirationTime = true,
-        ValidIssuer = builder.Configuration.GetSection("Jwt:Issuer").Value,
-        ValidAudience = builder.Configuration.GetSection("Jwt:Audience").Value,
         IssuerSigningKey = key
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("Token validation!");
+            if (context.Principal?.Identity is not ClaimsIdentity claims) return Task.CompletedTask;
+            var tokenType = claims.FindFirst("token_type");
+            if (tokenType is not { Value: "refresh_token" }) return Task.CompletedTask;
+            context.Fail("Unauthorized: Token is a refresh token");
+            return Task.CompletedTask;
+        },
+        OnAuthenticationFailed = context =>
+        {
+            context.Response.Headers.Add("Token-Authentication-Failed", "true");
+            // Log the exception
+            Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+            return Task.CompletedTask;
+        }
     };
 });
 
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<ILevelService, LevelService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IQuickplayService, QuickplayService>();
@@ -72,7 +85,7 @@ if (app.Environment.IsProduction())
 }
 
 using var serviceScope = app.Services.CreateScope();
-var dbContext = serviceScope.ServiceProvider.GetRequiredService<BingoDevContext>();
+var dbContext = serviceScope.ServiceProvider.GetRequiredService<PostgresContext>();
 dbContext.Database.Migrate();
 
 app.UseHttpsRedirection();
