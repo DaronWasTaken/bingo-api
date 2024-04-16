@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using bingo_api.Models.Entities;
+using bingo_api.Models.Entities.Services.Achievement;
 using bingo_api.Models.Services.Auth;
 using bingo_api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -10,12 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-});
+    .AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase; });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -44,18 +41,10 @@ builder.Services.AddAuthentication(options =>
     {
         OnTokenValidated = context =>
         {
-            Console.WriteLine("Token validation!");
             if (context.Principal?.Identity is not ClaimsIdentity claims) return Task.CompletedTask;
             var tokenType = claims.FindFirst("token_type");
             if (tokenType is not { Value: "refresh_token" }) return Task.CompletedTask;
             context.Fail("Unauthorized: Token is a refresh token");
-            return Task.CompletedTask;
-        },
-        OnAuthenticationFailed = context =>
-        {
-            context.Response.Headers.Add("Token-Authentication-Failed", "true");
-            // Log the exception
-            Console.WriteLine($"Authentication failed: {context.Exception.Message}");
             return Task.CompletedTask;
         }
     };
@@ -65,6 +54,7 @@ builder.Services.AddScoped<ILevelService, LevelService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IQuickplayService, QuickplayService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAchievementService, AchievementService>();
 builder.Logging.AddConsole();
 
 var app = builder.Build();
