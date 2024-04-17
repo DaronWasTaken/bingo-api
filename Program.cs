@@ -14,6 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase; });
 
+Console.WriteLine("CONNECTION STRING: {0}", builder.Configuration.GetConnectionString("DefaultConnection"));
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<PostgresContext>(options =>
@@ -74,11 +76,7 @@ if (app.Environment.IsProduction())
     app.UseHsts();
 }
 
-using var serviceScope = app.Services.CreateScope();
-var dbContext = serviceScope.ServiceProvider.GetRequiredService<PostgresContext>();
-dbContext.Database.Migrate();
-
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
@@ -87,5 +85,9 @@ app.UseCors(options => options
     .AllowAnyHeader()
     .AllowAnyMethod()
 );
+
+using var serviceScope = app.Services.CreateScope();
+var dbContext = serviceScope.ServiceProvider.GetRequiredService<PostgresContext>();
+dbContext.Database.Migrate();
 
 app.Run();

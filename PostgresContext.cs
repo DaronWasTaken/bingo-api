@@ -33,10 +33,6 @@ public partial class PostgresContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=admin");
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Achievement>(entity =>
@@ -139,7 +135,7 @@ public partial class PostgresContext : DbContext
             entity.Property(e => e.CompletedSubtasks).HasColumnName("completed_subtasks");
             entity.Property(e => e.CompletionDate).HasColumnName("completion_date");
             entity.Property(e => e.UserId).HasColumnName("user_id");
-
+            
             entity.HasOne(d => d.Achievement).WithMany(p => p.UserAchievements)
                 .HasForeignKey(d => d.AchievementId)
                 .OnDelete(DeleteBehavior.ClientSetNull)

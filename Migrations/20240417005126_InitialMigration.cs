@@ -131,7 +131,7 @@ namespace bingo_api.Migrations
                     user_id = table.Column<string>(type: "text", nullable: false),
                     achievement_id = table.Column<int>(type: "integer", nullable: false),
                     completed_subtasks = table.Column<int>(type: "integer", nullable: false),
-                    completion_date = table.Column<DateOnly>(type: "date", nullable: true)
+                    completion_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -244,6 +244,9 @@ namespace bingo_api.Migrations
                 name: "IX_usr_level_id",
                 table: "usr",
                 column: "level_id");
+
+            // Initialize with development mock data
+            migrationBuilder.Sql("INSERT INTO level VALUES(1, 100);\nINSERT INTO level VALUES(2, 1000);\nINSERT INTO level VALUES(3, 3000);\nINSERT INTO level VALUES(4, 10000);\nINSERT INTO item VALUES('test1', 'Pigeon', null, 200);\nINSERT INTO item VALUES('test2', 'Banana', null, 300);\nINSERT INTO item VALUES('test3', 'Car', null, 700);\nINSERT INTO item VALUES('test4', 'Ball', null, 500);\nINSERT INTO item VALUES('test5', 'Cards', null, 500);\nINSERT INTO item VALUES('test6', 'Crow', null, 500);\nINSERT INTO item VALUES('test7', 'Sparrow', null, 500);\nINSERT INTO item VALUES('test8', 'Bike', null, 500);\nINSERT INTO achievement VALUES('1', 'Birdie', 'Scan some birds', 'badge.svg', 1200, 2);\nINSERT INTO achievement VALUES('2', 'Royal Flush', 'Wasnt it supposed to be a toilet?', 'badge2.svg',1000, 1);\nINSERT INTO subtask VALUES('1', '1', 'Pigeon', null, 1, 'test1', null, null);\nINSERT INTO subtask VALUES('2', '1', 'Sparrow', null, 1, 'test7', null, null);\nINSERT INTO subtask VALUES('3', '2', 'Lazienki Krolewskie', null, 1, null, null, null);");
         }
 
         /// <inheritdoc />
