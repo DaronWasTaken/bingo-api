@@ -9,7 +9,7 @@ public class AchievementDto
     public string? BadgeFile { get; set; }
     public int TotalSubtasks { get; set; }
     public int CompletedSubtasks { get; set; }
-    public DateOnly? DateEarned { get; set; }
+    public DateTime? DateEarned { get; set; }
     public bool IsAchieved { get; set; }
     
 }

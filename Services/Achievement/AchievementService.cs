@@ -43,7 +43,7 @@ public class AchievementService : IAchievementService
             return;
         }
 
-        subtask.UserAchievement.CompletionDate = DateOnly.FromDateTime(DateTime.Now);
+        subtask.UserAchievement.CompletionDate = DateTime.UtcNow;
         
         var user = await _context.Users
             .Include(u => u.Level)

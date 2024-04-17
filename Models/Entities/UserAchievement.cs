@@ -13,7 +13,7 @@ public partial class UserAchievement
 
     public int CompletedSubtasks { get; set; }
 
-    public DateOnly? CompletionDate { get; set; }
+    public DateTime? CompletionDate { get; set; }
 
     public virtual Achievement Achievement { get; set; } = null!;
 

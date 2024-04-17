@@ -1,0 +1,51 @@
+services:
+  auth:
+    image: daronwastaken/bingo-auth:${DOCKER_IMAGE_TAG}
+    build:
+      context: ../bingo-auth/.
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      DB_CONN: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}?sslmode=disable
+      JWT_KEY: ${JWT_KEY}
+      JWT_TIME: ${JWT_TIME}
+      JWT_REFRESH_TIME: ${JWT_REFRESH_TIME}
+    depends_on:
+      db:
+        condition: service_healthy
+  
+  api:
+    image: daronwastaken/bingo-api:${DOCKER_IMAGE_TAG}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ConnectionStrings:DefaultConnection: Host=db;Port=5432;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=${POSTGRES_DB};
+      Jwt:Key: ${JWT_KEY}
+      AUTH_URI: http://auth:8081
+    depends_on:
+      db:
+        condition: service_healthy
+  
+  db:
+    image: postgres
+    restart: always
+    user: postgres
+    volumes:
+      - bingo-db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  bingo-db-data:

@@ -1,5 +1,6 @@
 ﻿using bingo_api.Models.Services.Auth;
 using bingo_api.Models.Views;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace bingo_api.Controllers;
@@ -18,7 +19,7 @@ public class AuthController : Controller
     
     
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginUserDto loginUserDto)
+    public async Task<IActionResult> Login([FromBody] LoginUserDto loginUserDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -27,9 +28,9 @@ public class AuthController : Controller
         {
             return Ok(await _authService.Login(loginUserDto));
         }
-        catch (Exception)
+        catch (HttpRequestException e)
         {
-            return StatusCode(500);
+            return BadRequest(e.Message);
         }
     }
     
@@ -51,7 +52,7 @@ public class AuthController : Controller
 
         return Ok("User has been registered!");
     }
-
+    
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] RefreshTokenDto refreshTokenDto)
     {

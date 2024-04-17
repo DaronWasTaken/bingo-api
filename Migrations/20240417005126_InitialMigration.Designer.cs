@@ -12,7 +12,7 @@ using bingo_api.Models.Entities;
 namespace bingo_api.Migrations
 {
     [DbContext(typeof(PostgresContext))]
-    [Migration("20240414115600_InitialMigration")]
+    [Migration("20240417005126_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -231,8 +231,8 @@ namespace bingo_api.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("completed_subtasks");
 
-                    b.Property<DateOnly?>("CompletionDate")
-                        .HasColumnType("date")
+                    b.Property<DateTime?>("CompletionDate")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("completion_date");
 
                     b.Property<string>("UserId")
