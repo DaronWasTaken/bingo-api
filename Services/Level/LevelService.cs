@@ -15,16 +15,19 @@ public class LevelService : ILevelService
     {
         user.Points += points;
         var pointsSurplus = user.Points - user.Level.RequiredPoints;
-        if (pointsSurplus >= 0)
+        while (pointsSurplus >= 0)
         {
-            if (await _context.Levels.FindAsync(user.LevelId + 1) != null)
+            var level = await _context.Levels.FindAsync(user.LevelId + 1);
+            if (level != null)
             {
                 user.LevelId += 1;
                 user.Points = pointsSurplus;
+                pointsSurplus -= level.RequiredPoints;
             }
             else
             {
                 user.Points = user.Level.RequiredPoints;
+                break;
             }
         }
     }

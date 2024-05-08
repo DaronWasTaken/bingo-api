@@ -158,7 +158,8 @@ public class UserService : IUserService
     {
         var achievementDetailsScreenDto = await _context.UserAchievements
             .Include(ua => ua.Achievement)
-            .Where(ua => ua.AchievementId == achievementId && ua.UserId == userId)
+            .Where(ua => ua.UserId == userId)
+            .Where(ua => ua.AchievementId == achievementId)
             .Select(ua => new AchievementDetailsScreenDto
             {
                 UserAchievementId = ua.Id,
@@ -171,6 +172,7 @@ public class UserService : IUserService
         var subtaskDtos = await _context.UserSubtasks
             .Include(us => us.Subtask)
             .Where(us => us.Subtask.AchievementId == achievementId)
+            .Where(us => us.UserAchievementId == achievementDetailsScreenDto.UserAchievementId)
             .Select(us => new SubtaskDto
             {
                 UserSubtaskId = us.Id,
