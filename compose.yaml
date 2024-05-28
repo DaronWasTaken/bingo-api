@@ -21,11 +21,18 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - ${API_HTTP_PORT}:80 # HTTP
+      - ${API_HTTPS_PORT}:443 # HTTPS
     environment:
       ConnectionStrings:DefaultConnection: Host=db;Port=5432;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Database=${POSTGRES_DB};
       Jwt:Key: ${JWT_KEY}
       AUTH_URI: http://auth:8081
+      TLS:Http_Port: ${API_HTTP_PORT}
+      TLS:Https_Port: ${API_HTTPS_PORT}
+      TLS:Cert_Path: /app/${CERT_PATH}
+      TLS:Cert_Password: ${CERT_PASSWORD}
+    volumes:
+      - ./${CERT_PATH}:/app/${CERT_PATH} # cert
     depends_on:
       db:
         condition: service_healthy

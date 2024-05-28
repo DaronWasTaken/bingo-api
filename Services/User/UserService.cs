@@ -171,6 +171,7 @@ public class UserService : IUserService
 
         var subtaskDtos = await _context.UserSubtasks
             .Include(us => us.Subtask)
+            .Include(us => us.Subtask.Location)
             .Where(us => us.Subtask.AchievementId == achievementId)
             .Where(us => us.UserAchievementId == achievementDetailsScreenDto.UserAchievementId)
             .Select(us => new SubtaskDto
@@ -182,7 +183,8 @@ public class UserService : IUserService
                 TotalNumber = us.Subtask.TotalNumber,
                 ImagePath = us.Subtask.ImageFile,
                 Location = us.Subtask.LocationId,
-                ItemId = us.Subtask.ItemId
+                ItemId = us.Subtask.ItemId,
+                Type = us.Subtask.Location == null ? SubtaskDto.SubtaskType.Scan : SubtaskDto.SubtaskType.Location
             })
             .ToListAsync();
 

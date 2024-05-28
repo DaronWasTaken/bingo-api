@@ -4,6 +4,7 @@ WORKDIR /source
 # copy csproj and restore as distinct layers
 COPY *.sln .
 COPY *.csproj .
+COPY bingo.pfx /app/bingo.pfx
 RUN dotnet restore
 
 # copy everything else and build app
@@ -16,4 +17,3 @@ FROM mcr.microsoft.com/dotnet/aspnet:6.0
 WORKDIR /app
 COPY --from=build /app ./
 ENTRYPOINT ["dotnet", "bingo-api.dll"]
-ENV ASPNETCORE_URLS=http://+:8080

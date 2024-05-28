@@ -1,6 +1,8 @@
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using bingo_api.Models.Entities;
 using bingo_api.Models.Entities.Services.Achievement;
 using bingo_api.Models.Services.Auth;
@@ -11,10 +13,18 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.AddConsole();
+builder.Services.AddScoped<ILevelService, LevelService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IQuickplayService, QuickplayService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAchievementService, AchievementService>();
 builder.Services.AddControllers()
-    .AddJsonOptions(options => { options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase; });
-
-Console.WriteLine("CONNECTION STRING: {0}", builder.Configuration.GetConnectionString("DefaultConnection"));
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -52,16 +62,21 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddScoped<ILevelService, LevelService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IQuickplayService, QuickplayService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IAchievementService, AchievementService>();
-builder.Logging.AddConsole();
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    var tlsConf = builder.Configuration.GetSection("TLS");
+    var httpPort = tlsConf.GetValue<int>("Http_Port");
+    var httpsPort = tlsConf.GetValue<int>("Https_Port");
+    var certPath = tlsConf.GetValue<string>("Cert_Path");
+    var certPassword = tlsConf.GetValue<string>("Cert_Password");
+
+    serverOptions.ListenAnyIP(httpPort);
+    serverOptions.ListenAnyIP(httpsPort,
+        listenOptions => { listenOptions.UseHttps(new X509Certificate2(certPath, certPassword)); });
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -76,7 +91,7 @@ if (app.Environment.IsProduction())
     app.UseHsts();
 }
 
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
