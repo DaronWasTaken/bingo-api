@@ -1,13 +1,13 @@
-using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using bingo_api;
 using bingo_api.Models.Entities;
 using bingo_api.Models.Entities.Services.Achievement;
 using bingo_api.Models.Services.Auth;
 using bingo_api.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -32,35 +32,11 @@ builder.Services.AddDbContext<PostgresContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    var keyString = builder.Configuration.GetValue<string>("Jwt:Key");
-    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
-
-    options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuerSigningKey = true,
-        ValidateAudience = false,
-        ValidateIssuer = false,
-        RequireExpirationTime = true,
-        IssuerSigningKey = key
-    };
-
-    options.Events = new JwtBearerEvents
-    {
-        OnTokenValidated = context =>
-        {
-            if (context.Principal?.Identity is not ClaimsIdentity claims) return Task.CompletedTask;
-            var tokenType = claims.FindFirst("token_type");
-            if (tokenType is not { Value: "refresh_token" }) return Task.CompletedTask;
-            context.Fail("Unauthorized: Token is a refresh token");
-            return Task.CompletedTask;
-        }
-    };
-});
+        options.DefaultAuthenticateScheme = "CustomToken";
+        options.DefaultChallengeScheme = "CustomToken";
+    })
+    .AddScheme<AuthenticationSchemeOptions, PostgresTokenAuthentication>("CustomToken", _ => { });
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {

@@ -32,6 +32,7 @@ public partial class PostgresContext : DbContext
     public virtual DbSet<UserSubtask> UserSubtasks { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<Token> Tokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -208,6 +209,29 @@ public partial class PostgresContext : DbContext
                 .HasForeignKey(d => d.LevelId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("usr_level");
+
+            entity.HasOne<Token>(usr => usr.Token).WithOne(t => t.User)
+                .HasForeignKey<Token>(t => t.UserId)
+                .HasConstraintName("usr_token")
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Token>(entity =>
+        {
+            entity.HasKey(e => e.UserId).HasName("token_pk");
+            entity.ToTable("token");
+            entity.Property(e => e.UserId).HasColumnName("usr_id");
+            entity.Property(e => e.AccessToken).HasColumnName("access_token");
+            entity.Property(e => e.RefreshToken).HasColumnName("refresh_token");
+            entity.Property(e => e.AccessExpiresAt)
+                .HasColumnName("access_expires_at")
+                .HasColumnType("timestamp with time zone");
+            entity.Property(e => e.RefreshExpiresAt)
+                .HasColumnName("refresh_expires_at")
+                .HasColumnType("timestamp with time zone");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at")
+                .HasColumnType("timestamp with time zone");
         });
 
         OnModelCreatingPartial(modelBuilder);

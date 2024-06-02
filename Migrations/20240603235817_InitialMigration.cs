@@ -124,6 +124,28 @@ namespace bingo_api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "token",
+                columns: table => new
+                {
+                    usr_id = table.Column<string>(type: "text", nullable: false),
+                    access_token = table.Column<string>(type: "text", nullable: false),
+                    refresh_token = table.Column<string>(type: "text", nullable: false),
+                    access_expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    refresh_expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("token_pk", x => x.usr_id);
+                    table.ForeignKey(
+                        name: "usr_token",
+                        column: x => x.usr_id,
+                        principalTable: "usr",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "user_achievement",
                 columns: table => new
                 {
@@ -244,7 +266,7 @@ namespace bingo_api.Migrations
                 name: "IX_usr_level_id",
                 table: "usr",
                 column: "level_id");
-
+            
             // Initialize with development mock data
             migrationBuilder.Sql("INSERT INTO level VALUES(1, 100);\nINSERT INTO level VALUES(2, 1000);\nINSERT INTO level VALUES(3, 3000);\nINSERT INTO level VALUES(4, 10000);\nINSERT INTO item VALUES('test1', 'Pigeon', null, 200);\nINSERT INTO item VALUES('test2', 'Banana', null, 300);\nINSERT INTO item VALUES('test3', 'Car', null, 700);\nINSERT INTO item VALUES('test4', 'Ball', null, 500);\nINSERT INTO item VALUES('test5', 'Cards', null, 500);\nINSERT INTO item VALUES('test6', 'Crow', null, 500);\nINSERT INTO item VALUES('test7', 'Sparrow', null, 500);\nINSERT INTO item VALUES('test8', 'Bike', null, 500);\nINSERT INTO achievement VALUES('1', 'Birdie', 'Scan some birds', 'badge.svg', 1200, 2);\nINSERT INTO achievement VALUES('2', 'Royal Flush', 'Wasnt it supposed to be a toilet?', 'badge2.svg',1000, 1);\nINSERT INTO subtask VALUES('1', '1', 'Pigeon', null, 1, 'test1', null, null);\nINSERT INTO subtask VALUES('2', '1', 'Sparrow', null, 1, 'test7', null, null);\nINSERT INTO subtask VALUES('3', '2', 'Lazienki Krolewskie', null, 1, null, null, null);");
         }
@@ -252,6 +274,9 @@ namespace bingo_api.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "token");
+
             migrationBuilder.DropTable(
                 name: "user_item");
 

@@ -4,7 +4,6 @@ WORKDIR /source
 # copy csproj and restore as distinct layers
 COPY *.sln .
 COPY *.csproj .
-COPY bingo.pfx /app/bingo.pfx
 RUN dotnet restore
 
 # copy everything else and build app
