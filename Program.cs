@@ -1,5 +1,4 @@
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using bingo_api;
@@ -9,11 +8,11 @@ using bingo_api.Models.Services.Auth;
 using bingo_api.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.AddConsole();
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<ILevelService, LevelService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IQuickplayService, QuickplayService>();
@@ -57,6 +56,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors(options => options
+        .AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+    );
 }
 
 if (app.Environment.IsProduction())
@@ -65,20 +69,20 @@ if (app.Environment.IsProduction())
     app.UseSwaggerUI();
     app.UseExceptionHandler("/error");
     app.UseHsts();
+    app.UseCors(options => options
+        .AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+    );
 }
+
+using var serviceScope = app.Services.CreateScope();
+var dbContext = serviceScope.ServiceProvider.GetRequiredService<PostgresContext>();
+dbContext.Database.Migrate();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseCors(options => options
-    .AllowAnyOrigin()
-    .AllowAnyHeader()
-    .AllowAnyMethod()
-);
-
-using var serviceScope = app.Services.CreateScope();
-var dbContext = serviceScope.ServiceProvider.GetRequiredService<PostgresContext>();
-dbContext.Database.Migrate();
 
 app.Run();

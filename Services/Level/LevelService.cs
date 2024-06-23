@@ -30,5 +30,6 @@ public class LevelService : ILevelService
                 break;
             }
         }
+        await _context.SaveChangesAsync();
     }
 }
