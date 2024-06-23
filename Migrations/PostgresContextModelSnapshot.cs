@@ -181,6 +181,40 @@ namespace bingo_api.Migrations
                     b.ToTable("subtask", (string)null);
                 });
 
+            modelBuilder.Entity("bingo_api.Models.Entities.Token", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text")
+                        .HasColumnName("usr_id");
+
+                    b.Property<DateTime>("AccessExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("access_expires_at");
+
+                    b.Property<string>("AccessToken")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("access_token");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("RefreshExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("refresh_expires_at");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("refresh_token");
+
+                    b.HasKey("UserId")
+                        .HasName("token_pk");
+
+                    b.ToTable("token", (string)null);
+                });
+
             modelBuilder.Entity("bingo_api.Models.Entities.User", b =>
                 {
                     b.Property<string>("Id")
@@ -328,6 +362,18 @@ namespace bingo_api.Migrations
                     b.Navigation("Location");
                 });
 
+            modelBuilder.Entity("bingo_api.Models.Entities.Token", b =>
+                {
+                    b.HasOne("bingo_api.Models.Entities.User", "User")
+                        .WithOne("Token")
+                        .HasForeignKey("bingo_api.Models.Entities.Token", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("usr_token");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("bingo_api.Models.Entities.User", b =>
                 {
                     b.HasOne("bingo_api.Models.Entities.Level", "Level")
@@ -427,6 +473,9 @@ namespace bingo_api.Migrations
 
             modelBuilder.Entity("bingo_api.Models.Entities.User", b =>
                 {
+                    b.Navigation("Token")
+                        .IsRequired();
+
                     b.Navigation("UserAchievements");
 
                     b.Navigation("UserItems");

@@ -11,23 +11,24 @@ public class AuthService : IAuthService
 {
     private readonly IUserService _userService;
     private readonly string _baseUri;
+    private readonly HttpClient _httpClient;
 
-    public AuthService(IConfiguration configuration, IUserService userService)
+    public AuthService(IConfiguration configuration, IUserService userService, HttpClient httpClient)
     {
         _userService = userService;
+        _httpClient = httpClient;
         _baseUri = configuration.GetValue<string>("AUTH_URI");
     }
 
     public async Task<TokenDto> Login(LoginUserDto userDto)
     {
         var uri = _baseUri + "/login";
-        var client = new HttpClient();
         var form = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
         {
             new("username", userDto.username),
             new("password", userDto.password)
         });
-        var res = await client.PostAsync(uri, form);
+        var res = await _httpClient.PostAsync(uri, form);
         res.EnsureSuccessStatusCode();
         var resBody = await res.Content.ReadAsStringAsync();
         var tokenDto = JsonSerializer.Deserialize<TokenDto>(resBody);
@@ -36,10 +37,12 @@ public class AuthService : IAuthService
     
     public async Task Register(RegisterUserDto userDto)
     {
-        var uri = _baseUri + "/register";
-        var client = new HttpClient();
         
-        var res = await client.PostAsJsonAsync(uri, userDto);
+        Console.WriteLine("REGISTER!!!!");
+        
+        var uri = _baseUri + "/register";
+        
+        var res = await _httpClient.PostAsJsonAsync(uri, userDto);
 
         if (res.StatusCode == HttpStatusCode.BadRequest)
         {
@@ -60,18 +63,19 @@ public class AuthService : IAuthService
             Points = 0
         };
         
+        Console.WriteLine("REGISTER DONE!!!");
+        
         await _userService.InitializeNewUserData(user);
     }
 
     public async Task<TokenDto> Refresh(string refreshToken)
     {
         var uri = _baseUri + "/refresh";
-        var client = new HttpClient();
         var form = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
         {
             new("refresh_token", refreshToken),
         });
-        var res = await client.PostAsync(uri, form);
+        var res = await _httpClient.PostAsync(uri, form);
         res.EnsureSuccessStatusCode();
         var resBody = await res.Content.ReadAsStringAsync();
         var tokenDto = JsonSerializer.Deserialize<TokenDto>(resBody);

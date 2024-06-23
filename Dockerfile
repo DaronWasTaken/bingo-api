@@ -16,4 +16,3 @@ FROM mcr.microsoft.com/dotnet/aspnet:6.0
 WORKDIR /app
 COPY --from=build /app ./
 ENTRYPOINT ["dotnet", "bingo-api.dll"]
-ENV ASPNETCORE_URLS=http://+:8080

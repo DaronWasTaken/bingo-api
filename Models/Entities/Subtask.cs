@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace bingo_api.Models.Entities;
+﻿namespace bingo_api.Models.Entities;
 
 public partial class Subtask
 {

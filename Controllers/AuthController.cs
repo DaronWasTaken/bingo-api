@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace bingo_api.Controllers;
 
 [ApiController]
+[AllowAnonymous]
 public class AuthController : Controller
 {
     private ILogger<AuthController> _logger;
@@ -56,8 +57,15 @@ public class AuthController : Controller
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] RefreshTokenDto refreshTokenDto)
     {
-        var tokenDto = await _authService.Refresh(refreshTokenDto.RefreshToken);
-        return Ok(tokenDto);
+        try
+        {
+            var tokenDto = await _authService.Refresh(refreshTokenDto.RefreshToken);
+            return Ok(tokenDto);
+        }
+        catch (HttpRequestException httpRequestException)
+        {
+            return Unauthorized();
+        }
     }
     
 }

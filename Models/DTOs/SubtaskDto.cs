@@ -10,4 +10,11 @@ public class SubtaskDto
     public string? ImagePath { get; set; }
     public string? Location { get; set; }
     public string? ItemId { get; set; }
+    public SubtaskType Type { get; set; }
+
+    public enum SubtaskType
+    {
+        Location,
+        Scan
+    }
 }

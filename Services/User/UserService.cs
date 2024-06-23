@@ -34,50 +34,56 @@ public class UserService : IUserService
 
     public async Task InitializeNewUserData(User user)
     {
-        var items = await _context.Items
-            .OrderBy(r => EF.Functions.Random())
-            .Take(5)
-            .ToListAsync();
-
-        items.ForEach(o =>
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+        try
         {
-            var item = new UserItem
-            {
-                Id = Guid.NewGuid().ToString(),
-                UserId = user.Id,
-                ItemId = o.Id
-            };
-
-            _context.UserItems.Add(item);
-        });
-
-        await _context.Achievements
-            .Include(a => a.Subtasks)
-            .ForEachAsync(async a =>
-            {
-                var userAchievementId = Guid.NewGuid().ToString();
-                await _context.UserAchievements.AddAsync(new UserAchievement
+            await _context.Items
+                .OrderBy(r => EF.Functions.Random())
+                .Take(5)
+                .ForEachAsync(o =>
                 {
-                    Id = userAchievementId,
-                    UserId = user.Id,
-                    AchievementId = a.Id,
-                    CompletedSubtasks = 0,
-                    CompletionDate = null
-                });
-                
-                foreach (var subtask in a.Subtasks)
-                {
-                    await _context.UserSubtasks.AddAsync(new UserSubtask
+                    var item = new UserItem
                     {
                         Id = Guid.NewGuid().ToString(),
-                        UserAchievementId = userAchievementId,
-                        SubtaskId = subtask.Id,
-                        NumberCompleted = 0
+                        UserId = user.Id,
+                        ItemId = o.Id
+                    };
+
+                    _context.UserItems.Add(item);
+                });
+
+
+            await _context.Achievements
+                .Include(a => a.Subtasks)
+                .ForEachAsync(a =>
+                {
+                    var userAchievementId = Guid.NewGuid().ToString();
+                    var userSubtasks = a.Subtasks.Select(subtask => new UserSubtask
+                    {
+                        Id = Guid.NewGuid().ToString(), UserAchievementId = userAchievementId,
+                        SubtaskId = subtask.Id, NumberCompleted = 0
+                    }).ToList();
+                    _context.UserAchievements.Add(new UserAchievement
+                    {
+                        Id = userAchievementId,
+                        UserId = user.Id,
+                        AchievementId = a.Id,
+                        CompletedSubtasks = 0,
+                        CompletionDate = null,
+                        UserSubtasks = userSubtasks
                     });
-                }
-            });
-        
-        await _context.SaveChangesAsync();
+                });
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex)
+        {
+            // Rollback the transaction on error
+            await transaction.RollbackAsync();
+            Console.WriteLine($"Transaction failed: {ex.Message}");
+            throw;
+        }
     }
 
     public async Task<IEnumerable<User>> GetUsersWithQuickplays()
@@ -158,7 +164,8 @@ public class UserService : IUserService
     {
         var achievementDetailsScreenDto = await _context.UserAchievements
             .Include(ua => ua.Achievement)
-            .Where(ua => ua.AchievementId == achievementId && ua.UserId == userId)
+            .Where(ua => ua.UserId == userId)
+            .Where(ua => ua.AchievementId == achievementId)
             .Select(ua => new AchievementDetailsScreenDto
             {
                 UserAchievementId = ua.Id,
@@ -170,7 +177,9 @@ public class UserService : IUserService
 
         var subtaskDtos = await _context.UserSubtasks
             .Include(us => us.Subtask)
+            .Include(us => us.Subtask.Location)
             .Where(us => us.Subtask.AchievementId == achievementId)
+            .Where(us => us.UserAchievementId == achievementDetailsScreenDto.UserAchievementId)
             .Select(us => new SubtaskDto
             {
                 UserSubtaskId = us.Id,
@@ -180,7 +189,8 @@ public class UserService : IUserService
                 TotalNumber = us.Subtask.TotalNumber,
                 ImagePath = us.Subtask.ImageFile,
                 Location = us.Subtask.LocationId,
-                ItemId = us.Subtask.ItemId
+                ItemId = us.Subtask.ItemId,
+                Type = us.Subtask.Location == null ? SubtaskDto.SubtaskType.Scan : SubtaskDto.SubtaskType.Location
             })
             .ToListAsync();
 

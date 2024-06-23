@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.Models.Entities;
 
@@ -20,4 +23,5 @@ public partial class User
     public virtual ICollection<UserAchievement> UserAchievements { get; set; } = new List<UserAchievement>();
 
     public virtual ICollection<UserItem> UserItems { get; set; } = new List<UserItem>();
+    public virtual Token Token { get; set; }
 }
