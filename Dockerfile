@@ -1,6 +1,7 @@
 # https://hub.docker.com/_/microsoft-dotnet
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /source
+
 # copy csproj and restore as distinct layers
 COPY *.sln .
 COPY *.csproj .
@@ -9,6 +10,8 @@ RUN dotnet restore
 # copy everything else and build app
 COPY . ./bingo-api/
 WORKDIR /source/bingo-api
+COPY ./bingo.pfx /app/bingo.pfx
+RUN chmod 644 ./bingo.pfx
 RUN dotnet publish -c release -o /app
 
 # final stage/image

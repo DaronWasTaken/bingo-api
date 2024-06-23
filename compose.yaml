@@ -31,8 +31,6 @@ services:
       TLS:Https_Port: ${API_HTTPS_PORT}
       TLS:Cert_Path: /app/${CERT_PATH}
       TLS:Cert_Password: ${CERT_PASSWORD}
-    volumes:
-      - ./${CERT_PATH}:/app/${CERT_PATH} # cert
     depends_on:
       db:
         condition: service_healthy
