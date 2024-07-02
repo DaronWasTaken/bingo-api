@@ -1,6 +1,6 @@
 ﻿using bingo_api.Models.Entities;
 
-namespace bingo_api.Services;
+namespace bingo_api.Services.Level;
 
 public class LevelService : ILevelService
 {

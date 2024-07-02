@@ -35,7 +35,6 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetUserQuickplayScreen()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        Console.WriteLine("UserID from token: {0}", userId);
         return Ok(await _userService.GetUserQuickplayScreen(userId));
     }
 

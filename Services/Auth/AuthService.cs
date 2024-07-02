@@ -3,6 +3,7 @@ using System.Text.Json;
 using bingo_api.Models.Entities;
 using bingo_api.Models.Views;
 using bingo_api.Services;
+using bingo_api.Services.Auth;
 using BadHttpRequestException = Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException;
 
 namespace bingo_api.Models.Services.Auth;
@@ -37,9 +38,6 @@ public class AuthService : IAuthService
     
     public async Task Register(RegisterUserDto userDto)
     {
-        
-        Console.WriteLine("REGISTER!!!!");
-        
         var uri = _baseUri + "/register";
         
         var res = await _httpClient.PostAsJsonAsync(uri, userDto);
@@ -62,8 +60,6 @@ public class AuthService : IAuthService
             LevelId = 1,
             Points = 0
         };
-        
-        Console.WriteLine("REGISTER DONE!!!");
         
         await _userService.InitializeNewUserData(user);
     }

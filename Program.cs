@@ -6,6 +6,9 @@ using bingo_api.Models.Entities;
 using bingo_api.Models.Entities.Services.Achievement;
 using bingo_api.Models.Services.Auth;
 using bingo_api.Services;
+using bingo_api.Services.Auth;
+using bingo_api.Services.Level;
+using bingo_api.Services.Quickplay;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,5 +1,6 @@
 ﻿using bingo_api.Models.Services.Auth;
 using bingo_api.Models.Views;
+using bingo_api.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,9 +1,8 @@
-﻿using bingo_api.Models;
-using bingo_api.Models.Entities;
+﻿using bingo_api.Models.Entities;
+using bingo_api.Services.Level;
 using Microsoft.EntityFrameworkCore;
-using Npgsql.Internal.TypeHandlers;
 
-namespace bingo_api.Services;
+namespace bingo_api.Services.Quickplay;
 
 public class QuickplayService : IQuickplayService
 {

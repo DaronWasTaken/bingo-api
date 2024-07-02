@@ -1,7 +1,6 @@
-﻿using System.Net;
-using bingo_api.Models.Views;
+﻿using bingo_api.Models.Views;
 
-namespace bingo_api.Models.Services.Auth;
+namespace bingo_api.Services.Auth;
 
 public interface IAuthService
 {

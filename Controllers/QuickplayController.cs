@@ -1,5 +1,6 @@
 ﻿using bingo_api.Models;
 using bingo_api.Services;
+using bingo_api.Services.Quickplay;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

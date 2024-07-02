@@ -1,5 +1,6 @@
 using bingo_api.Models.Views;
 using bingo_api.Services;
+using bingo_api.Services.Level;
 using Microsoft.EntityFrameworkCore;
 
 namespace bingo_api.Models.Entities.Services.Achievement;
@@ -52,10 +53,5 @@ public class AchievementService : IAchievementService
         
         await _levelService.AssignPointsToUser(user, subtask.UserAchievement.Achievement.Points);
         await _context.SaveChangesAsync();
-    }
-
-    public async Task AwardSubtaskLocation(SubtaskLocationDto subtaskLocationDto)
-    {
-            
     }
 }

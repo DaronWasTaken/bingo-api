@@ -1,4 +1,4 @@
-﻿namespace bingo_api.Services;
+﻿namespace bingo_api.Services.Quickplay;
 
 public interface IQuickplayService
 {
